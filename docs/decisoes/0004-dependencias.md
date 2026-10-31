@@ -19,6 +19,7 @@ Regra do projeto: toda biblioteca tem uma linha dizendo por que existe. Versões
 | `statsmodels` | Poder estatístico, tamanho de amostra e teste de duas proporções do A/B (Fase 3) |
 | `streamlit` | Ferramenta de rotulagem humana (Fase 4) e painel de métricas (Fase 8) |
 | `openai` | SDK para o endpoint compatível com OpenAI (Gemini, Groq): provedor trocável pelo `.env` (Fase 4) |
+| `sentence-transformers`, `transformers`, `torch` | Embeddings multilíngues locais para a triagem (Fase 5), sem custo por chamada. No CI, o `torch` é instalado na versão CPU |
 | `streamlit-shortcuts` | Atalhos de teclado na rotulagem (1 a 9, m, p, z): rotular 350 itens só com o mouse é lento e cansativo |
 | `matplotlib` | Gráficos gerados pelos scripts (curvas PR, confiabilidade, valor e SHAP). Saiu do `requirements-dev.txt` porque os scripts de relatório usam |
 

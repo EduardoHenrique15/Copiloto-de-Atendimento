@@ -1,0 +1,10 @@
+{
+  "embedding_model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+  "n_train": 4000,
+  "embedding_dim": 384,
+  "encode_seconds": 105.6,
+  "cv_agreement_with_llm_labels": {
+    "macro_f1": 0.6356941850410741,
+    "accuracy": 0.6935
+  }
+}

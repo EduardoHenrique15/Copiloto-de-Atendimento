@@ -183,3 +183,27 @@ Multirrótulo deixaria a rotulagem mais lenta e as métricas mais difíceis de e
 - **Por que 20 comentários por chamada?** O plano gratuito permite 500 chamadas por dia. Um por chamada levaria 8 dias; em lotes de 20, cerca de 200 chamadas cabem num dia só. O risco é o LLM se confundir com lotes grandes, por isso cada resposta é validada (um item para cada comentário, categoria da lista) e o lote é refeito uma vez se vier errado.
 - **Por que cache em disco?** A mesma entrada devolve a mesma resposta gravada. Se o script cair no meio, ele retoma sem pagar de novo pelo que já foi feito.
 - **Texto do cliente é dado, não instrução:** os comentários vão entre marcas `<comentario>` e o prompt manda ignorar instruções dentro deles. É a primeira defesa contra prompt injection, reforçada pelos guardrails da Fase 6.
+
+## Fase 5: triagem
+
+**Por que comparar três abordagens?**
+Cada uma tem um custo diferente:
+- O **LLM zero-shot** não precisa de treino e entende nuances, mas paga por chamada e responde em segundos.
+- **Embeddings + regressão logística** rodam localmente em milissegundos e de graça, mas precisam de exemplos rotulados e entendem menos nuance.
+- O **BERTimbau ajustado** costuma ser o mais preciso entre os modelos locais, mas precisa de GPU para treinar e é mais pesado para servir.
+A escolha certa depende dos números, não da moda.
+
+**Por que treinar no prata e avaliar no ouro?**
+O prata (rótulos do LLM) é barato e grande, bom para treino. O ouro (rótulos humanos) é caro e pequeno, mas é a verdade. Avaliar no prata mediria só "o quanto o modelo imita o LLM", com os erros do LLM incluídos.
+
+**Por que o teste só roda uma vez?**
+Se eu olho o teste, ajusto algo e olho de novo, o teste vira validação, e o número publicado fica otimista. Por isso o script exige `--final`, e todas as decisões (prompt, limiar) são tomadas na validação.
+
+**F1 macro**
+É a média do F1 de cada categoria, com peso igual para todas. A acurácia sozinha esconderia um modelo que acerta as categorias grandes e erra sempre as raras, como `atendimento_vendedor`.
+
+**Roteamento por confiança**
+Não é preciso classificar tudo automaticamente. Se o modelo tem pouca certeza, o ticket vai para uma pessoa. O limiar é escolhido para que os tickets automáticos tenham pelo menos 85% de acerto, e o relatório mostra quantos ficam automáticos (cobertura).
+
+**Custo de modelos locais**
+"De graça" não existe: o modelo local ocupa uma máquina. Para comparar com o LLM, o tempo de CPU por ticket é multiplicado por uma premissa de preço-hora (R$ 0,50 por hora), registrada no ADR 0009.

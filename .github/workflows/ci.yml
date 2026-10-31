@@ -18,7 +18,9 @@ jobs:
           cache-dependency-path: requirements-dev.txt
 
       - name: Instalar dependências
+        # torch da versão CPU primeiro: evita baixar a versão com CUDA (vários GB) no Linux.
         run: |
+          pip install torch==2.15.0 --index-url https://download.pytorch.org/whl/cpu
           pip install -r requirements-dev.txt
           pip install -e .
 

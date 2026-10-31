@@ -7,7 +7,7 @@
 | 2. Modelo de risco | Concluída | 2026-10-31 |
 | 3. Causal e A/B | Concluída | 2026-10-31 |
 | 4. Taxonomia e rotulagem | Em andamento (rotulagem humana) | |
-| 5. Triagem | Pendente | |
+| 5. Triagem | Código pronto; aguarda o ouro humano | |
 | 6. Copiloto, guardrails e API | Pendente | |
 | 7. Avaliação | Pendente | |
 | 8. n8n e painel (inclui redesenho visual) | Pendente | |
@@ -111,3 +111,18 @@ Uma segunda execução terminou sem o `KeyboardInterrupt` da primeira (que veio 
 ## Plano adicional pedido pelo Eduardo
 
 - **Redesenho visual** da ferramenta de rotulagem e do painel de métricas, para não parecerem um Streamlit padrão: identidade visual própria (paleta, tipografia), layout em cartões, hierarquia clara, estados vazios e feedback de ação. Será feito na Fase 8, junto com o painel e antes da gravação do vídeo, e revisado com prints antes de fechar a fase.
+
+## Fase 5: triagem (código adiantado em paralelo à rotulagem)
+
+**O que foi feito**
+- `src/copiloto/ai/triage/`: contrato comum (`base.py`), zero-shot com LLM e saída validada (`zero_shot.py`, prompt `triage-zs-v1`, já com a regra "não chegou ainda é `nao_recebido`" vinda da revisão do prata), embeddings + regressão logística (`embeddings_lr.py`), métricas de qualidade, latência, custo, robustez e roteamento por confiança (`metrics.py`, `compare.py`), leitura do prata e do ouro (`data.py`).
+- `scripts/train_triage_embeddings.py`, `scripts/evaluate_triage.py` (o teste exige `--final`; o LLM exige `--allow-llm`) e `scripts/export_for_colab.py`.
+- `notebooks/02-bertimbau-colab.ipynb`: ajuste fino no Colab, previsões devolvidas para avaliação local.
+- ADR 0009 (protocolo da comparação, definido antes dos resultados).
+
+**Pendências**
+- Ouro humano completo (Fase 4) para avaliar na validação e, por último, no teste.
+- Treinar a triagem por embeddings no PC (baixa o modelo do HuggingFace).
+- Rodar o zero-shot no ouro (com autorização: 100 chamadas na validação e 200 no teste).
+- BERTimbau no Colab.
+- Decisão de produção registrada no ADR 0009 e no model card.
