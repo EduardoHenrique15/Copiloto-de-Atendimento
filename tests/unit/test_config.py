@@ -56,3 +56,13 @@ def test_invalid_value_raises_configuration_error_without_value(monkeypatch):
 
 def test_get_settings_is_cached():
     assert config.get_settings() is config.get_settings()
+
+
+def test_empty_values_count_as_unset(tmp_path):
+    (tmp_path / ".env").write_text(
+        "USD_BRL=\nLLM_PRICE_QUOTE_DATE=\nRAG_TOP_K=\n", encoding="utf-8"
+    )
+    settings = Settings()
+    assert settings.usd_brl is None
+    assert settings.llm_price_quote_date is None
+    assert settings.rag_top_k == 4

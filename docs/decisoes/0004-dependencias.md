@@ -18,6 +18,7 @@ Regra do projeto: toda biblioteca tem uma linha dizendo por que existe. Versões
 | `joblib` | Salvar e carregar o modelo treinado (Fase 2) |
 | `statsmodels` | Poder estatístico, tamanho de amostra e teste de duas proporções do A/B (Fase 3) |
 | `streamlit` | Ferramenta de rotulagem humana (Fase 4) e painel de métricas (Fase 8) |
+| `openai` | SDK para o endpoint compatível com OpenAI (Gemini, Groq): provedor trocável pelo `.env` (Fase 4) |
 | `streamlit-shortcuts` | Atalhos de teclado na rotulagem (1 a 9, m, p, z): rotular 350 itens só com o mouse é lento e cansativo |
 | `matplotlib` | Gráficos gerados pelos scripts (curvas PR, confiabilidade, valor e SHAP). Saiu do `requirements-dev.txt` porque os scripts de relatório usam |
 
@@ -26,6 +27,7 @@ Regra do projeto: toda biblioteca tem uma linha dizendo por que existe. Versões
 | Biblioteca | Por quê |
 | --- | --- |
 | `pytest` | Testes automatizados |
+| `respx` | Simula as respostas HTTP do LLM nos testes, sem rede e sem gastar cota |
 | `ruff` | Lint e formatação |
 | `ipykernel` | Rodar o notebook no VS Code |
 

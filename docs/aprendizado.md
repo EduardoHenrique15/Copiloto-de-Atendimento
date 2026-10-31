@@ -176,3 +176,10 @@ A urgência depende de política da empresa ("dinheiro do cliente envolvido é s
 
 **Por que um rótulo principal mais a marcação "mais de um problema"?**
 Multirrótulo deixaria a rotulagem mais lenta e as métricas mais difíceis de explicar. A marcação permite medir, na Fase 5, se a triagem erra mais nesses casos, que é a análise de robustez pedida.
+
+**Rotulagem fraca (conjunto prata)**
+- **Para que serve:** treinar a triagem precisa de milhares de exemplos, e rotular tudo à mão não é viável. O LLM rotula cerca de 4.000 reclamações para treino. Esses rótulos têm erros, por isso o nome "fraca" ou "prata", e **nunca** são usados para medir qualidade. A medida vem só do ouro humano.
+- **Por que excluir o ouro e a amostra da taxonomia?** Se o LLM rotulasse os mesmos textos do teste, o modelo treinado com esses rótulos teria "visto a prova".
+- **Por que 20 comentários por chamada?** O plano gratuito permite 500 chamadas por dia. Um por chamada levaria 8 dias; em lotes de 20, cerca de 200 chamadas cabem num dia só. O risco é o LLM se confundir com lotes grandes, por isso cada resposta é validada (um item para cada comentário, categoria da lista) e o lote é refeito uma vez se vier errado.
+- **Por que cache em disco?** A mesma entrada devolve a mesma resposta gravada. Se o script cair no meio, ele retoma sem pagar de novo pelo que já foi feito.
+- **Texto do cliente é dado, não instrução:** os comentários vão entre marcas `<comentario>` e o prompt manda ignorar instruções dentro deles. É a primeira defesa contra prompt injection, reforçada pelos guardrails da Fase 6.

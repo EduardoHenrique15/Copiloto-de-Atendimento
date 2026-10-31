@@ -17,7 +17,10 @@ class Settings(BaseSettings):
     Segredos usam `SecretStr` para não aparecerem em logs nem em `repr`.
     """
 
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+    # env_ignore_empty: "USD_BRL=" (vazio, como no .env.example) vale como não definido.
+    model_config = SettingsConfigDict(
+        env_file=".env", env_file_encoding="utf-8", extra="ignore", env_ignore_empty=True
+    )
 
     # Geral
     app_env: Literal["development", "test", "production"] = "development"

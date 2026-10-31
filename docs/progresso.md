@@ -10,7 +10,7 @@
 | 5. Triagem | Pendente | |
 | 6. Copiloto, guardrails e API | Pendente | |
 | 7. Avaliação | Pendente | |
-| 8. n8n | Pendente | |
+| 8. n8n e painel (inclui redesenho visual) | Pendente | |
 | 9. Documentação e entrega | Pendente | |
 
 ## Fase 0: contas e ambiente (2026-10-31)
@@ -97,9 +97,16 @@ Uma segunda execução terminou sem o `KeyboardInterrupt` da primeira (que veio 
 - Ferramenta de rotulagem em Streamlit, com atalhos de teclado, pular e desfazer: `src/copiloto/dashboard/labeling_app.py`.
 - `scripts/make_gold_sample.py` (300 itens: 100 validação, 200 teste, 50 para repetir) e `scripts/labeler_agreement.py` (kappa).
 
-**Testes no ambiente de desenvolvimento:** `ruff check .` limpo, `ruff format .` aplicado e `pytest`: 100 testes passando (inclui a ferramenta de rotulagem de ponta a ponta com `AppTest`).
+**Testes no ambiente de desenvolvimento:** `ruff check .` limpo, `ruff format .` aplicado e `pytest`: 115 testes passando (inclui a ferramenta de rotulagem de ponta a ponta com `AppTest` e o cliente do LLM com HTTP simulado).
+
+- Rotulagem fraca com LLM pronta para rodar (`scripts/weak_label.py`): 4.000 reclamações (sem as do ouro e as da taxonomia), lotes de 20 por chamada, cache em disco, validação do JSON com Pydantic, retomada de onde parou e estimativa antes de chamar (ADR 0008).
+- Cliente do LLM (`src/copiloto/integrations/llm.py`) com cache, novas tentativas em limite de taxa e erros sem detalhes sensíveis; `ScriptedLLM` para os testes.
 
 **Pendências para fechar a fase**
 - O Eduardo rotula os 300 itens (rodada 1) e, 7 dias depois, os 50 repetidos (rodada 2).
 - Kappa do rotulador.
-- Conjunto prata com LLM (com autorização e estimativa de custo).
+- Rodar a rotulagem fraca (com autorização, depois da estimativa).
+
+## Plano adicional pedido pelo Eduardo
+
+- **Redesenho visual** da ferramenta de rotulagem e do painel de métricas, para não parecerem um Streamlit padrão: identidade visual própria (paleta, tipografia), layout em cartões, hierarquia clara, estados vazios e feedback de ação. Será feito na Fase 8, junto com o painel e antes da gravação do vídeo, e revisado com prints antes de fechar a fase.
