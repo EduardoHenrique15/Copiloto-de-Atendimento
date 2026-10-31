@@ -1,0 +1,79 @@
+{
+  "pool": {
+    "n": 1458,
+    "start": "2018-04-27",
+    "end": "2018-10-17",
+    "days": 174,
+    "daily_eligible": 8.379310344827585,
+    "baseline_negative_rate": 0.6358024691358025,
+    "mean_probability": 0.6380198352917972
+  },
+  "plan": [
+    {
+      "relative_reduction": 0.1,
+      "baseline_rate": 0.6358024691358025,
+      "treated_rate": 0.5722222222222223,
+      "n_per_group": 928,
+      "n_total": 1856,
+      "days": 221.49794238683128
+    },
+    {
+      "relative_reduction": 0.2,
+      "baseline_rate": 0.6358024691358025,
+      "treated_rate": 0.5086419753086421,
+      "n_per_group": 237,
+      "n_total": 474,
+      "days": 56.567901234567906
+    },
+    {
+      "relative_reduction": 0.3,
+      "baseline_rate": 0.6358024691358025,
+      "treated_rate": 0.44506172839506175,
+      "n_per_group": 106,
+      "n_total": 212,
+      "days": 25.30041152263375
+    }
+  ],
+  "assignment_check": {
+    "seed": 42,
+    "share_treatment": 0.4924554183813443
+  },
+  "simulations": [
+    {
+      "true_relative_reduction": 0.0,
+      "true_diff": -0.0,
+      "n_sims": 500,
+      "n_orders": 1458,
+      "share_significant": 0.046,
+      "mean_estimated_relative_change": -0.0020902809556370377,
+      "ci_coverage": 0.954
+    },
+    {
+      "true_relative_reduction": 0.1,
+      "true_diff": -0.06358024691358026,
+      "n_sims": 500,
+      "n_orders": 1458,
+      "share_significant": 0.738,
+      "mean_estimated_relative_change": -0.10178209047472983,
+      "ci_coverage": 0.96
+    },
+    {
+      "true_relative_reduction": 0.2,
+      "true_diff": -0.12716049382716052,
+      "n_sims": 500,
+      "n_orders": 1458,
+      "share_significant": 1.0,
+      "mean_estimated_relative_change": -0.20260032679301054,
+      "ci_coverage": 0.956
+    },
+    {
+      "true_relative_reduction": 0.3,
+      "true_diff": -0.19074074074074074,
+      "n_sims": 500,
+      "n_orders": 1458,
+      "share_significant": 1.0,
+      "mean_estimated_relative_change": -0.30191842206352826,
+      "ci_coverage": 0.96
+    }
+  ]
+}

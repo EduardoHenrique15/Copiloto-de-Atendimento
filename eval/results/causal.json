@@ -1,0 +1,599 @@
+{
+  "n_orders": 95824,
+  "n_late": 7661,
+  "late_rate": 0.07994865586909333,
+  "negative_rate_late": 0.5405299569246834,
+  "negative_rate_on_time": 0.09222689790501684,
+  "n_covariates": 99,
+  "overlap": {
+    "treated_min": 0.01,
+    "treated_max": 0.99,
+    "control_min": 0.01,
+    "control_max": 0.7588945951520344,
+    "common_low": 0.01,
+    "common_high": 0.7588945951520344,
+    "share_outside_common_support": 1.0435798964768744e-05,
+    "treated_mean_propensity": 0.12460777787311142,
+    "control_mean_propensity": 0.07614701394085673,
+    "share_at_clip": 0.022426531975288027
+  },
+  "balance": {
+    "before": {
+      "max_abs_smd": 0.2580747801537265,
+      "n_above_threshold": 14,
+      "n_covariates": 99
+    },
+    "ipw": {
+      "max_abs_smd": 0.021763876618479727,
+      "n_above_threshold": 0,
+      "n_covariates": 99
+    },
+    "matching": {
+      "max_abs_smd": 0.042253793949823065,
+      "n_above_threshold": 0,
+      "n_covariates": 99
+    }
+  },
+  "balance_table": {
+    "promised_days": {
+      "before": -0.23338853533118248,
+      "ipw": -0.0017845469032284906,
+      "matching": -0.012074988741264432
+    },
+    "distance_km__missing": {
+      "before": 0.024313918151792128,
+      "ipw": -6.283985483037894e-05,
+      "matching": -0.010872823074658906
+    },
+    "distance_km": {
+      "before": 0.2311241567493001,
+      "ipw": -0.005742591907789746,
+      "matching": -0.005608823205919968
+    },
+    "n_items": {
+      "before": -0.0613765591571805,
+      "ipw": -0.004002664208900406,
+      "matching": -0.014137170006343291
+    },
+    "n_sellers": {
+      "before": -0.13123266073102327,
+      "ipw": -0.004289500349637692,
+      "matching": -0.042253793949823065
+    },
+    "items_price": {
+      "before": 0.05136277506769524,
+      "ipw": -0.01461567263756738,
+      "matching": -0.029733200786660835
+    },
+    "freight_value": {
+      "before": 0.08702434853623689,
+      "ipw": -0.021763876618479727,
+      "matching": -0.0034813505743298855
+    },
+    "freight_ratio": {
+      "before": 0.027061537097464165,
+      "ipw": -0.0018131912692898604,
+      "matching": 0.006170077589291634
+    },
+    "max_installments__missing": {
+      "before": 0.016158484017509977,
+      "ipw": 0.016158484017509977,
+      "matching": 0.0
+    },
+    "max_installments": {
+      "before": 0.029763108058539663,
+      "ipw": -0.0012392069719544976,
+      "matching": -0.00882770104839966
+    },
+    "seller_prior_orders": {
+      "before": 0.07193736987266713,
+      "ipw": -0.0006061685509191148,
+      "matching": 0.0021270953334274196
+    },
+    "seller_prior_avg_score__missing": {
+      "before": -0.03756971204739305,
+      "ipw": -0.0013419138052560542,
+      "matching": -0.005497652176657398
+    },
+    "seller_prior_avg_score": {
+      "before": -0.08139325223559764,
+      "ipw": 0.0033612293067180887,
+      "matching": 0.010531978710017839
+    },
+    "seller_prior_late_rate__missing": {
+      "before": -0.0341886448494799,
+      "ipw": -0.0026711483721977847,
+      "matching": -0.012762320548611313
+    },
+    "seller_prior_late_rate": {
+      "before": 0.11064484598320352,
+      "ipw": -0.003816145574231621,
+      "matching": 0.013706189242869513
+    },
+    "purchase_month_index": {
+      "before": 0.18354645661694488,
+      "ipw": -0.006993694677615206,
+      "matching": 0.0017308077612433281
+    },
+    "same_state": {
+      "before": -0.20914079825451196,
+      "ipw": 0.005701221159605026,
+      "matching": 0.0067702204992165565
+    },
+    "customer_state_BA": {
+      "before": 0.12714645545380046,
+      "ipw": 0.0018754867698016692,
+      "matching": 0.009025283451112786
+    },
+    "customer_state_CE": {
+      "before": 0.09649766244769963,
+      "ipw": -0.0002736209895306816,
+      "matching": 0.010124869979311174
+    },
+    "customer_state_DF": {
+      "before": -0.0185168168396553,
+      "ipw": -0.00028031986749521413,
+      "matching": -0.01573751976304994
+    },
+    "customer_state_ES": {
+      "before": 0.06948145733753532,
+      "ipw": 0.004035953978631889,
+      "matching": -0.008251388541881875
+    },
+    "customer_state_GO": {
+      "before": -0.0005839516339284309,
+      "ipw": 0.0003490684394568214,
+      "matching": -0.019725722291496627
+    },
+    "customer_state_MA": {
+      "before": 0.10361756622626589,
+      "ipw": 0.004097284450660774,
+      "matching": -0.007769689535315199
+    },
+    "customer_state_MG": {
+      "before": -0.13218369149920509,
+      "ipw": -0.0003186658951263756,
+      "matching": 0.028335226131820133
+    },
+    "customer_state_MS": {
+      "before": 0.038178503413901665,
+      "ipw": 0.002304590481358115,
+      "matching": 0.002568329602374464
+    },
+    "customer_state_MT": {
+      "before": -0.019035689382514178,
+      "ipw": -0.0011910301035868102,
+      "matching": 0.012483127485115883
+    },
+    "customer_state_PA": {
+      "before": 0.04763583076373376,
+      "ipw": -0.005201825717756251,
+      "matching": -0.025915413012753456
+    },
+    "customer_state_PB": {
+      "before": 0.025463623238762313,
+      "ipw": -0.004711261947868612,
+      "matching": 0.0015532379551807028
+    },
+    "customer_state_PE": {
+      "before": 0.0434447315550305,
+      "ipw": -0.002887706313282277,
+      "matching": 0.001787903470228968
+    },
+    "customer_state_PI": {
+      "before": 0.06295414772957614,
+      "ipw": 0.001626716619954781,
+      "matching": 0.005374834393091
+    },
+    "customer_state_PR": {
+      "before": -0.10658973348627765,
+      "ipw": -0.0007840325702587612,
+      "matching": -0.015385017928288919
+    },
+    "customer_state_RJ": {
+      "before": 0.24851591377070653,
+      "ipw": -0.005933392801185886,
+      "matching": -0.0066931348772075105
+    },
+    "customer_state_RN": {
+      "before": 0.023365013575578044,
+      "ipw": -0.001694808388450324,
+      "matching": -0.012483127485115883
+    },
+    "customer_state_RO": {
+      "before": -0.041455885421812416,
+      "ipw": 9.496594243766606e-05,
+      "matching": 0.00448347104806377
+    },
+    "customer_state_RS": {
+      "before": -0.030350509196311527,
+      "ipw": -0.002992471034380645,
+      "matching": -0.004200788183813693
+    },
+    "customer_state_SC": {
+      "before": 0.04167552992717065,
+      "ipw": -0.00195898165881234,
+      "matching": 0.0006352148640411421
+    },
+    "customer_state_SE": {
+      "before": 0.04747321719799399,
+      "ipw": -0.00047460234992133563,
+      "matching": 0.004937607716137358
+    },
+    "customer_state_SP": {
+      "before": -0.2580747801537265,
+      "ipw": 0.006475710031760478,
+      "matching": 0.010500074438907927
+    },
+    "customer_state_TO": {
+      "before": 0.031064689254545877,
+      "ipw": 0.0020918143300123404,
+      "matching": 0.005935237830985587
+    },
+    "customer_state_outros": {
+      "before": -0.025010476253215702,
+      "ipw": -0.000696746796070877,
+      "matching": -0.007979019710780477
+    },
+    "seller_state_DF": {
+      "before": -0.025281978296482932,
+      "ipw": -0.0007014561935282811,
+      "matching": 0.0
+    },
+    "seller_state_ES": {
+      "before": -0.009006581730762728,
+      "ipw": 0.0002412871987197966,
+      "matching": 0.002526916833175355
+    },
+    "seller_state_GO": {
+      "before": -0.041980211206914135,
+      "ipw": 9.704314208776577e-07,
+      "matching": 0.01452583367177649
+    },
+    "seller_state_MA": {
+      "before": 0.09353527073355006,
+      "ipw": -0.0011100143008595674,
+      "matching": 0.012685994237317633
+    },
+    "seller_state_MG": {
+      "before": -0.10863105980224974,
+      "ipw": -0.0015665199077523637,
+      "matching": 0.0017311112134307007
+    },
+    "seller_state_PE": {
+      "before": -0.03699919521625245,
+      "ipw": 0.0002730152019682533,
+      "matching": 0.011812265269608192
+    },
+    "seller_state_PR": {
+      "before": -0.06625683894181908,
+      "ipw": 0.002333544065875156,
+      "matching": 0.009317661503321906
+    },
+    "seller_state_RJ": {
+      "before": 0.0082777254713328,
+      "ipw": -0.001861985220656806,
+      "matching": 0.019976493120947358
+    },
+    "seller_state_RS": {
+      "before": -0.08209105637617783,
+      "ipw": 0.000883721646989072,
+      "matching": 0.007753141668420727
+    },
+    "seller_state_SC": {
+      "before": -0.05751559561833481,
+      "ipw": -0.00018625768694734786,
+      "matching": 0.021391338993300382
+    },
+    "seller_state_SP": {
+      "before": 0.14707090629538216,
+      "ipw": -0.00044590068759183904,
+      "matching": -0.030947596638190546
+    },
+    "seller_state_outros": {
+      "before": -0.009789026833812029,
+      "ipw": 0.00045986209976787713,
+      "matching": -0.012541136422044605
+    },
+    "main_category_audio": {
+      "before": 0.03526608851564793,
+      "ipw": 0.0015182860604020904,
+      "matching": 0.00349465616972156
+    },
+    "main_category_auto": {
+      "before": 0.015283684358991348,
+      "ipw": -0.0019264403829033778,
+      "matching": -0.02708891856762086
+    },
+    "main_category_baby": {
+      "before": 0.02482055772471901,
+      "ipw": -0.0012108024542962076,
+      "matching": 0.014252638986804348
+    },
+    "main_category_bed_bath_table": {
+      "before": 0.028233528107404145,
+      "ipw": -0.00030786301285517067,
+      "matching": 0.005180136243087309
+    },
+    "main_category_books_general_interest": {
+      "before": -0.012432229079532117,
+      "ipw": 0.00015169983229376086,
+      "matching": 0.002008479624775128
+    },
+    "main_category_books_technical": {
+      "before": 0.01982723660313985,
+      "ipw": 8.823031999987236e-05,
+      "matching": -0.0021442373929144104
+    },
+    "main_category_computers_accessories": {
+      "before": -0.014311269857714453,
+      "ipw": -2.125111956187367e-05,
+      "matching": 0.002666284265973985
+    },
+    "main_category_consoles_games": {
+      "before": -0.0003743281209748487,
+      "ipw": -0.0005219945920813008,
+      "matching": -0.012462571127893585
+    },
+    "main_category_construction_tools_construction": {
+      "before": 0.012007824240506627,
+      "ipw": -0.0013823586849010412,
+      "matching": -0.00560812386769696
+    },
+    "main_category_construction_tools_lights": {
+      "before": 0.008039607787557612,
+      "ipw": 0.0017138258507595208,
+      "matching": -0.009544202012751593
+    },
+    "main_category_cool_stuff": {
+      "before": -0.03528524851954005,
+      "ipw": 0.0009002128598694156,
+      "matching": 0.0030407157300612457
+    },
+    "main_category_drinks": {
+      "before": -0.009637686621605796,
+      "ipw": 0.000195051242847903,
+      "matching": -0.012338290661707512
+    },
+    "main_category_electronics": {
+      "before": 0.039521586676825864,
+      "ipw": 0.004094658545653997,
+      "matching": 0.005982885939736267
+    },
+    "main_category_fashion_bags_accessories": {
+      "before": -0.027352204069042423,
+      "ipw": 0.0003818340389146069,
+      "matching": -0.0010534551132753216
+    },
+    "main_category_fashion_shoes": {
+      "before": -0.013248757531637295,
+      "ipw": 0.0012017075814030852,
+      "matching": 0.02068596597118875
+    },
+    "main_category_fixed_telephony": {
+      "before": -0.022575133708356704,
+      "ipw": -0.0036730612981444796,
+      "matching": -0.027033061376263375
+    },
+    "main_category_food": {
+      "before": 0.017000501531411267,
+      "ipw": -0.002123958888064444,
+      "matching": -0.0017373119709246005
+    },
+    "main_category_food_drink": {
+      "before": -0.010936148406278847,
+      "ipw": 0.0012101484868439322,
+      "matching": -0.0030034025298633932
+    },
+    "main_category_furniture_decor": {
+      "before": 0.01882422119593731,
+      "ipw": -0.0006096681396658734,
+      "matching": 0.00676185000583023
+    },
+    "main_category_furniture_living_room": {
+      "before": 0.0015268421073769325,
+      "ipw": 0.0019398086519945255,
+      "matching": -0.001978404866636637
+    },
+    "main_category_garden_tools": {
+      "before": -0.0002356796131450237,
+      "ipw": 0.0026311572954471705,
+      "matching": -0.016639198072097076
+    },
+    "main_category_health_beauty": {
+      "before": 0.035097769000452896,
+      "ipw": 0.0036288105423272553,
+      "matching": 0.015481238216621552
+    },
+    "main_category_home_appliances": {
+      "before": -0.015912361500088512,
+      "ipw": -0.0015920453934095277,
+      "matching": 0.0016292620791679914
+    },
+    "main_category_home_appliances_2": {
+      "before": -0.0062138892978621865,
+      "ipw": -0.002620029650048181,
+      "matching": 0.005906055378783598
+    },
+    "main_category_home_confort": {
+      "before": 0.01849155887416052,
+      "ipw": 0.002757789305055224,
+      "matching": 0.0018704057956848903
+    },
+    "main_category_home_construction": {
+      "before": 0.000859109598082216,
+      "ipw": -0.0011433844526427366,
+      "matching": -0.04174640251904795
+    },
+    "main_category_housewares": {
+      "before": -0.038125076414726226,
+      "ipw": -0.0003299416603399685,
+      "matching": -0.0017784151354553767
+    },
+    "main_category_industry_commerce_and_business": {
+      "before": -0.0004337347746371119,
+      "ipw": 0.0002631160479617675,
+      "matching": 0.008447671584701246
+    },
+    "main_category_kitchen_dining_laundry_garden_furniture": {
+      "before": -0.024805603228909276,
+      "ipw": -0.001138857599152842,
+      "matching": -0.021024955664274887
+    },
+    "main_category_luggage_accessories": {
+      "before": -0.04009464960384808,
+      "ipw": 0.0018812440164386814,
+      "matching": 0.014663747966123662
+    },
+    "main_category_market_place": {
+      "before": -0.024573327273695978,
+      "ipw": 0.0002941269746406086,
+      "matching": -0.011812265269608192
+    },
+    "main_category_musical_instruments": {
+      "before": 0.010261927237836616,
+      "ipw": -0.0012699028473929241,
+      "matching": 0.0031498211247687627
+    },
+    "main_category_office_furniture": {
+      "before": 0.015595892177321245,
+      "ipw": -0.0029794521391267527,
+      "matching": 0.023977266626947547
+    },
+    "main_category_outros": {
+      "before": -0.027800362447859838,
+      "ipw": -0.001379470511044895,
+      "matching": 0.004814348017392523
+    },
+    "main_category_perfumery": {
+      "before": -0.015239287439029739,
+      "ipw": -0.002288787800695971,
+      "matching": 0.010967227578539745
+    },
+    "main_category_pet_shop": {
+      "before": -0.03527074583184762,
+      "ipw": 0.00010061464839643608,
+      "matching": 0.0034250826965874248
+    },
+    "main_category_small_appliances": {
+      "before": -0.020982750684185383,
+      "ipw": -0.00023973618052137042,
+      "matching": 0.0
+    },
+    "main_category_sports_leisure": {
+      "before": -0.011457217977699389,
+      "ipw": 0.00037791046613353544,
+      "matching": 0.01709410135225837
+    },
+    "main_category_stationery": {
+      "before": -0.0050821182925269975,
+      "ipw": 0.0005545585748870719,
+      "matching": 0.011638613092419252
+    },
+    "main_category_telephony": {
+      "before": 0.014116812905816258,
+      "ipw": 0.0027302577865640455,
+      "matching": 0.011490884384209362
+    },
+    "main_category_toys": {
+      "before": -0.018896933159387536,
+      "ipw": -0.0012495796340615828,
+      "matching": -0.013116744882528512
+    },
+    "main_category_unknown": {
+      "before": 0.013125023286299886,
+      "ipw": 2.131797634578692e-05,
+      "matching": -0.022237213173892934
+    },
+    "main_category_watches_gifts": {
+      "before": 0.012988315557525491,
+      "ipw": -0.0004414643917671199,
+      "matching": -0.021632103643401786
+    },
+    "main_payment_type_credit_card": {
+      "before": -0.037833155611371,
+      "ipw": 0.0028306968785902897,
+      "matching": 0.014818519053817413
+    },
+    "main_payment_type_debit_card": {
+      "before": -0.002409818378460733,
+      "ipw": -0.0010603607865094765,
+      "matching": -0.003186729592324567
+    },
+    "main_payment_type_outros": {
+      "before": 0.016158484017509977,
+      "ipw": 0.016158484017509977,
+      "matching": 0.0
+    },
+    "main_payment_type_voucher": {
+      "before": -0.025430496365086496,
+      "ipw": 1.504031720538287e-05,
+      "matching": -0.02789658514392583
+    }
+  },
+  "estimates": {
+    "naive": 0.4483030590196666,
+    "ipw_att": 0.45281301884054403,
+    "ipw_att_control_mean": 0.08771693808413938,
+    "ipw_ate": 0.45688395729614334,
+    "matching_att": 0.45169712793733685
+  },
+  "bootstrap": {
+    "naive": {
+      "ci_low": 0.43667132730762076,
+      "ci_high": 0.4579385009458394,
+      "se": 0.005595700924541411
+    },
+    "ipw_att": {
+      "ci_low": 0.4407266783758839,
+      "ci_high": 0.46307756947254225,
+      "se": 0.005715125661906911
+    },
+    "ipw_att_control_mean": {
+      "ci_low": 0.08485214928042199,
+      "ci_high": 0.09020878645642944,
+      "se": 0.0014109996263728366
+    },
+    "ipw_ate": {
+      "ci_low": 0.4429283887426522,
+      "ci_high": 0.47115143716135577,
+      "se": 0.0073421834775023315
+    },
+    "matching_att": {
+      "ci_low": 0.4383816727059488,
+      "ci_high": 0.4654011542569232,
+      "se": 0.007467733433185341
+    },
+    "n_boot": 200
+  },
+  "matching_details": {
+    "effect": 0.45169712793733685,
+    "mean_treated": 0.5404699738903395,
+    "mean_control": 0.08877284595300261,
+    "n_treated_matched": 7660,
+    "n_treated_dropped": 1,
+    "n_unique_controls": 6860
+  },
+  "score_effect": {
+    "naive": -1.7286699879751133,
+    "ipw_att": -1.7467483250874363,
+    "matching_att": -1.7415143603133165
+  },
+  "sensitivity": {
+    "risk_ratio": 6.162207308310273,
+    "risk_ratio_ci_low": 5.415953912379617,
+    "e_value": 11.802295215628941,
+    "e_value_ci": 10.306414306722921
+  },
+  "business": {
+    "extra_negatives_per_1000_late": 452.81301884054403,
+    "extra_negatives_per_1000_late_ci": [
+      440.7266783758839,
+      463.0775694725422
+    ],
+    "negative_review_cost_brl": 30.0,
+    "cost_per_1000_late_brl": 13584.390565216321,
+    "late_orders_in_base": 7661,
+    "extra_negatives_in_base": 3469.000537337408
+  }
+}

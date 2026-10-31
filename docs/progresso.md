@@ -5,7 +5,7 @@
 | 0. Contas e ambiente | Concluída | 2026-10-31 |
 | 1. Fundação e dados | Concluída | 2026-10-31 |
 | 2. Modelo de risco | Concluída | 2026-10-31 |
-| 3. Causal e A/B | Pendente | |
+| 3. Causal e A/B | Concluída | 2026-10-31 |
 | 4. Taxonomia e rotulagem | Pendente | |
 | 5. Triagem | Pendente | |
 | 6. Copiloto, guardrails e API | Pendente | |
@@ -66,3 +66,24 @@ Uma segunda execução terminou sem o `KeyboardInterrupt` da primeira (que veio 
 **Pendências**
 - Efeito do contato (20%) é premissa. Será tratado no desenho do A/B (Fase 3).
 - Análise de equidade por estado: registrada como limitação.
+
+## Fase 3: análise causal e desenho do A/B (2026-10-31)
+
+**O que foi feito**
+- `src/copiloto/ds/causal/`: confundidores e matriz de desenho (`data.py`), propensão e sobreposição (`propensity.py`), diferença ingênua, IPW e pareamento implementados à mão (`estimators.py`), balanceamento por SMD (`balance.py`), E-value (`sensitivity.py`), análise com bootstrap (`analysis.py`) e relatório (`report.py`).
+- `src/copiloto/ds/experiment/`: tamanho de amostra e duração (`power.py`), sorteio determinístico por hash (`assignment.py`), análise planejada (`analysis.py`), simulação com efeito conhecido (`simulate.py`) e desenho a partir do modelo de risco (`design.py`).
+- `scripts/causal_analysis.py` e `scripts/ab_design.py`.
+- Testes com dados sintéticos de efeito conhecido: a diferença ingênua exagera o efeito, enquanto IPW e pareamento recuperam o valor verdadeiro. Também testados: fórmula do tamanho de amostra, sorteio estável e balanceado, falso positivo perto de 5% na simulação.
+- ADR 0006 (IPW e pareamento à mão).
+
+**Testes no ambiente de desenvolvimento:** `ruff check .` limpo, `ruff format .` aplicado e `pytest`: 79 testes passando.
+
+**Resultados na base real**
+- Efeito do atraso na chance de nota negativa (ATT): IPW +45,3 p.p. (IC 95% +44,1 a +46,3), pareamento +45,2 p.p., diferença ingênua +44,8 p.p. O ajuste quase não muda o número, porque os confundidores observados explicam pouco.
+- Balanceamento: o maior |SMD| caiu de 0,258 para 0,022 (IPW). Sobreposição completa. E-value 11,8.
+- 453 negativas a mais a cada 1.000 atrasos (IC 441 a 463), cerca de 3.469 na base.
+- A/B: 8,4 pedidos elegíveis por dia, linha de base de 63,6%. Para 20% de redução, 237 por grupo (57 dias); para 10%, 221 dias. Simulação: 4,6% de falso positivo e IC com cerca de 95% de cobertura.
+- Documentos: `docs/analise-causal.md` e `docs/experimento-ab.md`.
+
+**Pendências**
+- O registro dos grupos no banco fica para a Fase 6 (`POST /risk/batch`), que usa `assign_group`.

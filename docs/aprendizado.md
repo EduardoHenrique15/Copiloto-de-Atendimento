@@ -97,3 +97,62 @@ Cada item tem teste automatizado.
 - **Por que o LightGBM venceu a logística?** O risco não cresce em linha reta com o atraso. Ele fica baixo até o prazo e dispara a partir de alguns dias de atraso (Fase 1: 19% com 1 a 3 dias, 67% com 4 a 10 dias). Árvores capturam esse "degrau" naturalmente.
 - **Por que a calibração mudou pouco?** O LightGBM já saiu quase calibrado. Platt ganhou por pouco na validação. O ECE caiu à metade, mas o Brier quase não mudou. Isso é dito no model card em vez de vender a calibração como grande ganho.
 - **Mudança de distribuição:** a taxa negativa caiu de 13,5% (treino) para 9,9% (teste). Em produção, isso pede monitoramento da taxa base e retreino periódico.
+
+## Fase 3: análise causal e desenho do A/B
+
+**Por que a correlação não basta?**
+Na Fase 1, atrasados deram 54% de notas negativas, contra 9% dos entregues no prazo. Mas os atrasados não são pedidos "iguais com atraso": eles vêm mais de longe, de certas categorias e de vendedores com histórico pior, e esses fatores já pioram a nota mesmo sem atraso. Esses fatores são os **confundidores**. A diferença ingênua mistura o efeito do atraso com o efeito deles.
+
+**O que é o escore de propensão?**
+É a probabilidade de um pedido atrasar dados os confundidores (distância, prazo prometido, categoria, estados, vendedor, frete, mês da compra). Dois pedidos com a mesma propensão são comparáveis: um atrasou e o outro não, mas tinham a mesma chance de atrasar.
+
+**IPW (ponderação pelo inverso da propensão)**
+Dá peso aos pedidos entregues no prazo para que, juntos, se pareçam com os atrasados. Um pedido no prazo com propensão alta ("tinha tudo para atrasar") pesa mais. Depois, compara as médias ponderadas.
+
+**Pareamento**
+Para cada pedido atrasado, encontra o pedido no prazo com propensão mais parecida e compara os pares. Pares muito diferentes (além do caliper) são descartados. Dois métodos com premissas diferentes chegando a números parecidos dão mais confiança.
+
+**ATT ou ATE?**
+- **ATT:** o efeito nos pedidos que de fato atrasaram. Responde "quanto o atraso custou de verdade".
+- **ATE:** o efeito se qualquer pedido atrasasse.
+A pergunta de negócio ("cada 1.000 atrasados geram quantas negativas a mais?") é ATT.
+
+**Sobreposição e balanceamento**
+- **Sobreposição:** só dá para comparar se existirem pedidos no prazo com propensões parecidas às dos atrasados. O histograma de propensão mostra isso.
+- **Balanceamento:** depois de ponderar, as médias dos confundidores precisam ficar parecidas entre os grupos. A medida é a diferença média padronizada (SMD), e |SMD| < 0,1 é o critério usual.
+
+**Bootstrap**
+Reamostra os pedidos 200 vezes e refaz tudo, inclusive a propensão. A variação das estimativas dá o intervalo de confiança.
+
+**E-value**
+Mede quão forte um confundidor **não observado** (por exemplo, a qualidade da embalagem) precisaria ser para explicar todo o efeito. E-value alto significa que só um confundidor muito forte anularia o resultado. Ele não prova causalidade: mostra o quão robusta é a conclusão.
+
+**Por que implementar IPW e pareamento à mão?**
+São poucas linhas e ficam totalmente transparentes e testáveis. Os testes usam dados sintéticos com efeito conhecido (25 pontos percentuais): a diferença ingênua erra para cima, e IPW e pareamento acertam.
+
+### Desenho do A/B
+
+**Por que um teste A/B?**
+O valor do contato proativo depende do efeito do contato, que hoje é uma premissa (20%). Só um experimento mede esse efeito.
+
+**Como funciona o sorteio?**
+Um hash do id do pedido com uma semente decide o grupo. O mesmo pedido cai sempre no mesmo grupo, sem precisar guardar estado, e trocar a semente gera um sorteio novo e independente.
+
+**Tamanho de amostra**
+Depende de três coisas: a taxa negativa no grupo de alto risco (linha de base), o menor efeito que vale a pena detectar e o poder desejado (80%, com 5% de chance de falso positivo). Efeitos menores exigem amostras muito maiores.
+
+**Simulação**
+Aplicamos um efeito conhecido nos dados históricos, sorteamos os grupos de novo várias vezes e rodamos a análise planejada. Com efeito zero, cerca de 5% das simulações dão "significativo": é o falso positivo esperado. Com efeito real, a fração significativa é o poder com o volume disponível.
+
+**Riscos do experimento**
+- **Contaminação:** o mesmo cliente com pedidos nos dois grupos. Mitigação: sortear por cliente numa versão real.
+- **Efeito novidade:** o primeiro contato surpreende, e os seguintes, menos.
+- **Parar cedo demais:** olhar o valor-p todo dia e parar quando ficar "significativo" infla o falso positivo. Mitigação: duração fixada antes e análise só no fim.
+
+### Resultados reais e como contar em entrevista
+
+- "Atraso aumenta em 45 pontos percentuais a chance de nota negativa nos pedidos atrasados: de 8,8% para 54%. São 453 avaliações negativas a mais a cada 1.000 atrasos."
+- **"Mas isso não é só correlação?"** "Controlei 99 covariáveis com propensão, IPW e pareamento. O balanceamento ficou bom (todas com |SMD| abaixo de 0,1) e os dois métodos deram o mesmo número. O E-value de 11,8 diz que um confundidor não medido precisaria multiplicar por 10 a chance de atraso e de nota ruim para anular o efeito."
+- **Resultado surpreendente:** o ajuste quase não mudou a diferença ingênua (44,8 contra 45,3). Eu esperava que mudasse. Isso mostra que os fatores observados (distância, categoria, vendedor) explicam pouco da nota. O atraso domina. Os testes com dados sintéticos provam que o método corrige o viés quando ele existe, então o resultado não vem de um método quebrado.
+- **A/B:** "O contato só se paga se evitar pelo menos 10,5% das negativas. Com 8 pedidos de alto risco por dia, detectar 10% levaria 221 dias. Recomendei desenhar para 20% (57 dias), deixando claro que um efeito perto do mínimo não seria detectado." Isso mostra que o tamanho do teste vem de uma decisão de negócio, não de um número mágico.
+- **Por que simular?** Para provar, antes de gastar com clientes reais, que a análise planejada tem cerca de 5% de falso positivo e que o intervalo de confiança cobre o efeito verdadeiro cerca de 95% das vezes.

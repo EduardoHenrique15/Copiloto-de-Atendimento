@@ -16,6 +16,7 @@ Regra do projeto: toda biblioteca tem uma linha dizendo por que existe. Versões
 | `lightgbm` | Modelo de gradiente para dados tabulares (Fase 2) |
 | `shap` | Explicação global e por pedido do modelo de risco (Fase 2). Versão 0.51.0 porque as seguintes exigem Python 3.12 |
 | `joblib` | Salvar e carregar o modelo treinado (Fase 2) |
+| `statsmodels` | Poder estatístico, tamanho de amostra e teste de duas proporções do A/B (Fase 3) |
 | `matplotlib` | Gráficos gerados pelos scripts (curvas PR, confiabilidade, valor e SHAP). Saiu do `requirements-dev.txt` porque os scripts de relatório usam |
 
 ## Desenvolvimento (`requirements-dev.txt`)
