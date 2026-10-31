@@ -8,7 +8,7 @@
 | 3. Causal e A/B | Concluída | 2026-10-31 |
 | 4. Taxonomia e rotulagem | Em andamento (rotulagem humana) | |
 | 5. Triagem | Código pronto; aguarda o ouro humano | |
-| 6. Copiloto, guardrails e API | Pendente | |
+| 6. Copiloto, guardrails e API | Em andamento (parte A: copiloto e guardrails) | |
 | 7. Avaliação | Pendente | |
 | 8. n8n e painel (inclui redesenho visual) | Pendente | |
 | 9. Documentação e entrega | Pendente | |
@@ -126,3 +126,16 @@ Uma segunda execução terminou sem o `KeyboardInterrupt` da primeira (que veio 
 - Rodar o zero-shot no ouro (com autorização: 100 chamadas na validação e 200 no teste).
 - BERTimbau no Colab.
 - Decisão de produção registrada no ADR 0009 e no model card.
+
+## Fase 6: copiloto, guardrails e API (em andamento)
+
+**Parte A: copiloto e guardrails**
+- 10 políticas **fictícias** da Loja Exemplo em `policies/` (cada uma com o aviso de ficção e a lista de ações permitidas), divididas em 26 trechos.
+- Busca vetorial: `integrations/vectorstore.py` (ChromaDB persistente e versão em memória) e `ai/copilot/retrieve.py`. A consulta junta a descrição da categoria da triagem ao texto do cliente.
+- Os 6 guardrails da seção 8.4, determinísticos e em código (`ai/guardrails/`): dados pessoais, prompt injection, ação permitida pela política, promessas sem base, citação obrigatória e tamanho e tom. Cada um tem testes.
+- Rascunho (`ai/copilot/draft.py`, prompt `draft-v1`): mascara dados pessoais **antes** do LLM, detecta injection, recupera as políticas, gera a saída estruturada (resposta, políticas citadas, ação, precisa de humano, motivo) e aplica os guardrails de saída. Promessa inventada troca a resposta pelo texto de encaminhamento.
+- `scripts/index_policies.py` para indexar e testar a busca. ADR 0010.
+
+**Testes:** `ruff check .` limpo, `ruff format .` aplicado e `pytest`: 169 testes passando, todos com o LLM falso.
+
+**Próximo (parte B):** banco operacional, API (`/triage`, `/draft`, `/feedback`, `/risk/batch`, `/metrics`), idempotência, tabela `llm_calls` e testes de contrato.

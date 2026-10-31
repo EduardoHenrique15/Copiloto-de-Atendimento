@@ -207,3 +207,23 @@ Não é preciso classificar tudo automaticamente. Se o modelo tem pouca certeza,
 
 **Custo de modelos locais**
 "De graça" não existe: o modelo local ocupa uma máquina. Para comparar com o LLM, o tempo de CPU por ticket é multiplicado por uma premissa de preço-hora (R$ 0,50 por hora), registrada no ADR 0009.
+
+## Fase 6: copiloto e guardrails
+
+**O que é RAG?**
+Retrieval-Augmented Generation: antes de pedir o rascunho ao LLM, buscamos os trechos de política mais parecidos com a reclamação e colocamos esses trechos no prompt. O LLM responde com base neles, e não no que "acha" que a loja faz. Cada trecho tem um id, e o rascunho precisa citar os ids que usou.
+
+**Por que as políticas são fictícias?**
+Não temos as regras reais de nenhuma loja. Inventar e deixar explícito ("Política fictícia criada para este projeto") é honesto, e mostra o mecanismo funcionando sem fingir que é uma loja real.
+
+**Por que guardrails em código, e não só no prompt?**
+Um prompt pede; o código garante. O LLM pode ignorar uma instrução, mas não consegue passar por um `if`. Os guardrails são regras simples, testáveis e explicáveis:
+1. **Dados pessoais:** CPF, e-mail, telefone e CEP são mascarados antes de ir ao LLM. O provedor nunca vê o dado.
+2. **Prompt injection:** o texto do cliente vai delimitado como dado. Frases como "ignore as instruções" marcam o caso para revisão humana.
+3. **Ação permitida:** o LLM só pode sugerir reembolso se a política de reembolso foi citada. Senão, a ação vira "escalar".
+4. **Promessas:** todo valor em reais, porcentagem ou prazo no rascunho precisa aparecer nas políticas recuperadas ou nos dados do pedido. Se o LLM inventar "R$ 500 de bônus", o rascunho é trocado por uma mensagem de encaminhamento.
+5. **Citação obrigatória:** rascunho sem política citada vai para revisão humana.
+6. **Tamanho e tom:** limite de caracteres e termos proibidos ("garantimos", "com certeza").
+
+**Por que os eventos não guardam o texto do cliente?**
+Log é lido por muita gente e fica guardado por muito tempo. O evento registra o tipo ("pii_masked: cpf: 1"), nunca o conteúdo.

@@ -18,3 +18,4 @@ openai==3.42.0
 torch==2.15.0
 transformers==5.22.1
 sentence-transformers==6.2.0
+chromadb==1.5.9
