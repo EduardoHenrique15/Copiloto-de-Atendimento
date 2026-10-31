@@ -23,4 +23,6 @@ select = ["E", "F", "I", "B", "UP", "SIM", "N"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["."]
+filterwarnings = ["ignore::PendingDeprecationWarning:shap.*"]
 markers = ["integration: testes que rodam o dbt na amostra fictícia (mais lentos)"]

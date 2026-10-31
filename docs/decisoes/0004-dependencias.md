@@ -11,7 +11,12 @@ Regra do projeto: toda biblioteca tem uma linha dizendo por que existe. Versões
 | `structlog` | Logs em JSON com correlation id |
 | `duckdb` | Banco analítico em arquivo, lido pelos scripts e notebooks |
 | `dbt-core`, `dbt-duckdb` | Transformações SQL versionadas e testadas (ADR 0003) |
-| `pandas` | Tabelas em memória para análise e modelos (usado a partir da Fase 2) |
+| `pandas` | Tabelas em memória para análise e modelos |
+| `scikit-learn` | Regressão logística, pré-processamento, calibração e métricas (Fase 2) |
+| `lightgbm` | Modelo de gradiente para dados tabulares (Fase 2) |
+| `shap` | Explicação global e por pedido do modelo de risco (Fase 2). Versão 0.51.0 porque as seguintes exigem Python 3.12 |
+| `joblib` | Salvar e carregar o modelo treinado (Fase 2) |
+| `matplotlib` | Gráficos gerados pelos scripts (curvas PR, confiabilidade, valor e SHAP). Saiu do `requirements-dev.txt` porque os scripts de relatório usam |
 
 ## Desenvolvimento (`requirements-dev.txt`)
 
@@ -19,7 +24,6 @@ Regra do projeto: toda biblioteca tem uma linha dizendo por que existe. Versões
 | --- | --- |
 | `pytest` | Testes automatizados |
 | `ruff` | Lint e formatação |
-| `matplotlib` | Gráficos do notebook de exploração |
 | `ipykernel` | Rodar o notebook no VS Code |
 
 As próximas fases acrescentam linhas a esta tabela.

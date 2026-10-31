@@ -57,3 +57,43 @@ Na Olist, a pesquisa de satisfação é enviada perto da data estimada. Pedidos 
 - Nenhum pedido tem entrega antes da compra.
 
 **Cuidado ao contar essa história:** "atrasados têm 54% de notas negativas contra 9%" é correlação. Pedidos atrasados tendem a ser de regiões distantes e de certos vendedores, que já teriam notas piores. Quanto do efeito é causado pelo atraso fica para a Fase 3.
+
+## Fase 2: modelo de risco
+
+**Qual é a pergunta?**
+No dia da entrega, quais pedidos têm mais chance de receber nota 1 ou 2? Com essa lista, o atendimento pode agir antes da avaliação.
+
+**Por que três modelos?**
+- **Regra simples** ("negativo se atrasou"): é o que qualquer pessoa faria sem modelo. Se o modelo não superar a regra, não vale a complexidade.
+- **Regressão logística:** interpretável e rápida. Mostra quanto um modelo linear consegue.
+- **LightGBM:** captura relações não lineares (por exemplo, o risco que dispara a partir de alguns dias de atraso) e interações.
+
+**Por que PR-AUC, e não acurácia?**
+Só cerca de 13% dos pedidos são negativos. Um modelo que diz "nunca negativo" acerta 87% e não serve para nada. A PR-AUC mede o quanto o modelo encontra os negativos (recall) sem encher a lista de falsos alarmes (precisão). A referência de um modelo aleatório é a taxa base, cerca de 0,13.
+
+**Por que a divisão é temporal?**
+Em produção, o modelo treina com o passado e prevê o futuro. Uma divisão aleatória mistura meses e deixa o modelo "ver" padrões do futuro, o que infla as métricas. Aqui: os primeiros 70% (pela data de entrega) treinam, os 15% seguintes validam e os últimos 15% testam. Além disso, um pedido só entra no treino se a avaliação dele já existia no início da validação, porque quem treina o modelo naquele dia não conhece avaliações futuras.
+
+**O que é calibração e por que importa?**
+Calibrado quer dizer: entre os pedidos com probabilidade 30%, cerca de 30% são de fato negativos. O LightGBM ordena bem os pedidos, mas suas probabilidades podem ficar distorcidas. Como o limiar usa a probabilidade para calcular dinheiro, ela precisa ser confiável. Comparamos três opções (sem calibração, isotônica e Platt) numa metade da validação que o calibrador não viu, e o teste nunca é usado nessa escolha. O Brier score e o ECE medem a calibração.
+
+**Por que o limiar não é 0,5?**
+Contatar custa R$ 2. Evitar uma nota negativa vale R$ 30, mas o contato só evita 20% delas. Então contatar compensa quando p × 0,2 × 30 > 2, ou seja, p > 0,33. O limiar escolhido é o que maximiza o valor líquido na validação. A curva de valor e a tabela de sensibilidade mostram o que acontece se as premissas mudarem.
+
+**O que o SHAP mostra?**
+Quanto cada feature empurrou a probabilidade de um pedido para cima ou para baixo. O SHAP global mostra quais features mais importam no geral. Os três exemplos (risco alto, médio e baixo) mostram os motivos de pedidos específicos. São esses motivos que o atendente vai ver na Fase 6.
+
+**Como o vazamento é evitado?**
+1. A lista de features é verificada: nenhuma coluna da avaliação nem o alvo.
+2. Toda data usada é anterior ou igual à entrega.
+3. O histórico do vendedor é calculado só com o passado (Fase 1, testado no dbt).
+4. A divisão é temporal, com a regra de rótulo disponível.
+Cada item tem teste automatizado.
+
+**Resultados reais e como contar em entrevista**
+- "O LightGBM teve PR-AUC de 0,343 no teste temporal, contra 0,156 da regra 'negativo se atrasou' e 0,099 de um sorteio. O intervalo de confiança da diferença (bootstrap) ficou entre +0,17 e +0,21, então o ganho não é sorte."
+- "No limiar de 0,41, escolhido por custo, o modelo contatou 549 clientes com 60% de precisão. A regra de contatar todo atrasado precisou de 1.017 contatos para alcançar quase as mesmas negativas (342 contra 329)."
+- "O valor em reais depende de premissas. Com contato a R$ 5 e efeito de 20%, não vale contatar ninguém. Por isso o próximo passo é medir o efeito com um teste A/B."
+- **Por que o LightGBM venceu a logística?** O risco não cresce em linha reta com o atraso. Ele fica baixo até o prazo e dispara a partir de alguns dias de atraso (Fase 1: 19% com 1 a 3 dias, 67% com 4 a 10 dias). Árvores capturam esse "degrau" naturalmente.
+- **Por que a calibração mudou pouco?** O LightGBM já saiu quase calibrado. Platt ganhou por pouco na validação. O ECE caiu à metade, mas o Brier quase não mudou. Isso é dito no model card em vez de vender a calibração como grande ganho.
+- **Mudança de distribuição:** a taxa negativa caiu de 13,5% (treino) para 9,9% (teste). Em produção, isso pede monitoramento da taxa base e retreino periódico.

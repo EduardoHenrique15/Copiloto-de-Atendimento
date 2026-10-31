@@ -3,8 +3,8 @@
 | Fase | Status | Data |
 | --- | --- | --- |
 | 0. Contas e ambiente | Concluída | 2026-10-31 |
-| 1. Fundação e dados | Em validação (aguarda dbt na base real e CI) | |
-| 2. Modelo de risco | Pendente | |
+| 1. Fundação e dados | Concluída | 2026-10-31 |
+| 2. Modelo de risco | Concluída | 2026-10-31 |
 | 3. Causal e A/B | Pendente | |
 | 4. Taxonomia e rotulagem | Pendente | |
 | 5. Triagem | Pendente | |
@@ -28,7 +28,7 @@
 - `TEST_EMAIL_TO`, a credencial de e-mail, o `chat_id` do Telegram e a key e o token do Trello ficam para a Fase 8.
 - O teste do Groq fica para quando a reserva for necessária.
 
-## Fase 1: fundação e dados (em validação)
+## Fase 1: fundação e dados (2026-10-31)
 
 **O que foi feito**
 - Estrutura de pastas, `pyproject.toml`, `requirements*.txt` com versões fixadas, `.env.example` e LICENSE MIT.
@@ -43,6 +43,26 @@
 
 **Execução na base real (Windows):** `pytest` com 32 testes passando e `dbt build` com PASS=64, WARN=1, ERROR=0. O aviso é esperado: 4.967 avaliações foram criadas antes da entrega. Números em `docs/eda-resumo.md` e explicados em `docs/aprendizado.md`.
 
-**Pendências para fechar a fase**
-- Na primeira execução, o dbt terminou os 65 passos e depois recebeu um `KeyboardInterrupt` sem ação do usuário. Falta confirmar numa segunda execução.
-- Confirmar o CI verde no GitHub.
+Uma segunda execução terminou sem o `KeyboardInterrupt` da primeira (que veio do terminal, depois dos 65 passos concluídos). CI verde no GitHub.
+
+**Pendências:** nenhuma.
+
+## Fase 2: modelo de risco (2026-10-31)
+
+**O que foi feito**
+- `src/copiloto/ds/risk/`: features e proteção contra vazamento (`features.py`), divisão temporal (`split.py`), regra simples, regressão logística e LightGBM (`models.py`), calibração (`calibration.py`), limiar por custo (`threshold.py`), métricas com bootstrap (`evaluate.py`), SHAP (`explain.py`), pipeline e relatório (`pipeline.py`, `report.py`).
+- `scripts/train_risk.py` gera `eval/results/risk_metrics.json`, `docs/model-cards/risco-resultados.md` e os gráficos em `docs/figures/risk/`.
+- Testes com dados sintéticos (`tests/fakes/risk_data.py`): vazamento, divisão temporal, limiar calculado à mão, calibração e pipeline de ponta a ponta.
+- ADR 0005 (limiar por custo).
+
+**Testes no ambiente de desenvolvimento:** `ruff check .` limpo, `ruff format .` aplicado e `pytest`: 58 testes passando.
+
+**Resultados na base real** (teste temporal, 14.374 pedidos de 29/06 a 17/10/2018):
+- PR-AUC: regra "atrasou" 0,156; logística 0,290; LightGBM 0,343 (+0,187 sobre a regra, IC 95% +0,167 a +0,208).
+- Calibração de Platt: ECE de 0,0154 para 0,0068.
+- Limiar por custo: 0,41. No teste, 549 contatos, 59,9% de precisão e R$ 876 de valor líquido, contra R$ 18 da regra "contatar atrasados".
+- Model card: `docs/model-cards/risco.md`.
+
+**Pendências**
+- Efeito do contato (20%) é premissa. Será tratado no desenho do A/B (Fase 3).
+- Análise de equidade por estado: registrada como limitação.
