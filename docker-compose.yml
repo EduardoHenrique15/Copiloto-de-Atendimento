@@ -1,0 +1,41 @@
+# Serviços da Fase 6 (API e banco). O n8n e o painel entram na Fase 8.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: copiloto
+      POSTGRES_PASSWORD: copiloto
+      POSTGRES_DB: copiloto
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U copiloto"]
+      interval: 5s
+      retries: 10
+
+  api:
+    build: .
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://copiloto:copiloto@db:5432/copiloto
+      DATA_DIR: /app/data
+      CHROMA_DIR: /app/.chroma
+      LLM_CACHE_DIR: /app/.llm_cache
+      HF_HOME: /app/.hf_cache
+    volumes:
+      - ./data/processed:/app/data/processed:ro
+      - ./models:/app/models:ro
+      - chroma:/app/.chroma
+      - llm_cache:/app/.llm_cache
+      - hf_cache:/app/.hf_cache
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pg_data:
+  chroma:
+  llm_cache:
+  hf_cache:

@@ -36,3 +36,4 @@ dbt/dbt_packages/
 # Sistema
 .DS_Store
 Thumbs.db
+*.db

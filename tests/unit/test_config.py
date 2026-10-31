@@ -66,3 +66,16 @@ def test_empty_values_count_as_unset(tmp_path):
     assert settings.usd_brl is None
     assert settings.llm_price_quote_date is None
     assert settings.rag_top_k == 4
+
+
+def test_env_example_lists_every_setting_once():
+    """O .env.example é o modelo do .env: cada variável aparece uma vez, em linha própria."""
+    import re
+
+    root = Path(__file__).resolve().parents[2]
+    lines = (root / ".env.example").read_text(encoding="utf-8").splitlines()
+    names = [m.group(1) for line in lines if (m := re.match(r"^([A-Z][A-Z0-9_]*)=", line))]
+    assert len(names) == len(set(names))
+    assert {"API_KEY", "LLM_API_KEY", "GROQ_API_KEY", "DATABASE_URL"} <= set(names)
+    expected = {f.upper() for f in Settings.model_fields}
+    assert expected <= set(names)

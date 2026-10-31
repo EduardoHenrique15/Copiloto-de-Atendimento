@@ -1,0 +1,506 @@
+{
+  "DraftRequest": {
+    "additionalProperties": false,
+    "properties": {
+      "ticket_id": {
+        "maxLength": 64,
+        "minLength": 1,
+        "title": "Ticket Id",
+        "type": "string"
+      }
+    },
+    "required": [
+      "ticket_id"
+    ],
+    "title": "DraftRequest",
+    "type": "object"
+  },
+  "DraftResponse": {
+    "additionalProperties": false,
+    "properties": {
+      "draft_id": {
+        "title": "Draft Id",
+        "type": "string"
+      },
+      "guardrail_flags": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Guardrail Flags",
+        "type": "array"
+      },
+      "needs_human": {
+        "title": "Needs Human",
+        "type": "boolean"
+      },
+      "policies_cited": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Policies Cited",
+        "type": "array"
+      },
+      "response": {
+        "title": "Response",
+        "type": "string"
+      },
+      "suggested_action": {
+        "enum": [
+          "nenhuma",
+          "cupom",
+          "troca",
+          "reembolso",
+          "escalar"
+        ],
+        "title": "Suggested Action",
+        "type": "string"
+      },
+      "ticket_id": {
+        "title": "Ticket Id",
+        "type": "string"
+      }
+    },
+    "required": [
+      "draft_id",
+      "ticket_id",
+      "response",
+      "policies_cited",
+      "suggested_action",
+      "needs_human",
+      "guardrail_flags"
+    ],
+    "title": "DraftResponse",
+    "type": "object"
+  },
+  "ErrorResponse": {
+    "additionalProperties": false,
+    "properties": {
+      "detail": {
+        "title": "Detail",
+        "type": "string"
+      }
+    },
+    "required": [
+      "detail"
+    ],
+    "title": "ErrorResponse",
+    "type": "object"
+  },
+  "FeedbackRequest": {
+    "additionalProperties": false,
+    "properties": {
+      "decision": {
+        "enum": [
+          "approved",
+          "edited",
+          "rejected"
+        ],
+        "title": "Decision",
+        "type": "string"
+      },
+      "draft_id": {
+        "maxLength": 64,
+        "minLength": 1,
+        "title": "Draft Id",
+        "type": "string"
+      },
+      "final_text": {
+        "anyOf": [
+          {
+            "maxLength": 5000,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Final Text"
+      },
+      "reviewer": {
+        "maxLength": 64,
+        "minLength": 1,
+        "title": "Reviewer",
+        "type": "string"
+      }
+    },
+    "required": [
+      "draft_id",
+      "decision",
+      "reviewer"
+    ],
+    "title": "FeedbackRequest",
+    "type": "object"
+  },
+  "FeedbackResponse": {
+    "additionalProperties": false,
+    "properties": {
+      "decision": {
+        "enum": [
+          "approved",
+          "edited",
+          "rejected"
+        ],
+        "title": "Decision",
+        "type": "string"
+      },
+      "draft_id": {
+        "title": "Draft Id",
+        "type": "string"
+      },
+      "status": {
+        "title": "Status",
+        "type": "string"
+      }
+    },
+    "required": [
+      "draft_id",
+      "decision",
+      "status"
+    ],
+    "title": "FeedbackResponse",
+    "type": "object"
+  },
+  "HealthResponse": {
+    "additionalProperties": false,
+    "properties": {
+      "database": {
+        "enum": [
+          "ok",
+          "erro"
+        ],
+        "title": "Database",
+        "type": "string"
+      },
+      "status": {
+        "enum": [
+          "ok",
+          "degradado"
+        ],
+        "title": "Status",
+        "type": "string"
+      }
+    },
+    "required": [
+      "status",
+      "database"
+    ],
+    "title": "HealthResponse",
+    "type": "object"
+  },
+  "MetricsResponse": {
+    "additionalProperties": false,
+    "properties": {
+      "approval_without_edit_rate": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Approval Without Edit Rate"
+      },
+      "cost_brl": {
+        "title": "Cost Brl",
+        "type": "number"
+      },
+      "drafts": {
+        "title": "Drafts",
+        "type": "integer"
+      },
+      "feedback": {
+        "title": "Feedback",
+        "type": "integer"
+      },
+      "guardrail_block_rate": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Guardrail Block Rate"
+      },
+      "latency_p50_ms": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Latency P50 Ms"
+      },
+      "latency_p95_ms": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Latency P95 Ms"
+      },
+      "llm_calls": {
+        "title": "Llm Calls",
+        "type": "integer"
+      },
+      "period": {
+        "enum": [
+          "day",
+          "week"
+        ],
+        "title": "Period",
+        "type": "string"
+      },
+      "since": {
+        "title": "Since",
+        "type": "string"
+      },
+      "tickets_by_category": {
+        "additionalProperties": {
+          "type": "integer"
+        },
+        "title": "Tickets By Category",
+        "type": "object"
+      }
+    },
+    "required": [
+      "period",
+      "since",
+      "llm_calls",
+      "cost_brl",
+      "latency_p50_ms",
+      "latency_p95_ms",
+      "drafts",
+      "guardrail_block_rate",
+      "feedback",
+      "approval_without_edit_rate",
+      "tickets_by_category"
+    ],
+    "title": "MetricsResponse",
+    "type": "object"
+  },
+  "RiskBatchRequest": {
+    "additionalProperties": false,
+    "properties": {
+      "date": {
+        "format": "date",
+        "title": "Date",
+        "type": "string"
+      }
+    },
+    "required": [
+      "date"
+    ],
+    "title": "RiskBatchRequest",
+    "type": "object"
+  },
+  "RiskBatchResponse": {
+    "additionalProperties": false,
+    "properties": {
+      "date": {
+        "format": "date",
+        "title": "Date",
+        "type": "string"
+      },
+      "orders": {
+        "items": {
+          "$ref": "#/components/schemas/RiskOrder"
+        },
+        "title": "Orders",
+        "type": "array"
+      },
+      "threshold": {
+        "title": "Threshold",
+        "type": "number"
+      }
+    },
+    "required": [
+      "date",
+      "threshold",
+      "orders"
+    ],
+    "title": "RiskBatchResponse",
+    "type": "object"
+  },
+  "RiskOrder": {
+    "additionalProperties": false,
+    "properties": {
+      "group": {
+        "enum": [
+          "treatment",
+          "control"
+        ],
+        "title": "Group",
+        "type": "string"
+      },
+      "order_id": {
+        "title": "Order Id",
+        "type": "string"
+      },
+      "probability": {
+        "maximum": 1.0,
+        "minimum": 0.0,
+        "title": "Probability",
+        "type": "number"
+      },
+      "reasons": {
+        "items": {
+          "$ref": "#/components/schemas/RiskReason"
+        },
+        "title": "Reasons",
+        "type": "array"
+      }
+    },
+    "required": [
+      "order_id",
+      "probability",
+      "group",
+      "reasons"
+    ],
+    "title": "RiskOrder",
+    "type": "object"
+  },
+  "RiskReason": {
+    "additionalProperties": false,
+    "properties": {
+      "direction": {
+        "enum": [
+          "aumenta",
+          "reduz"
+        ],
+        "title": "Direction",
+        "type": "string"
+      },
+      "feature": {
+        "title": "Feature",
+        "type": "string"
+      },
+      "value": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "number"
+          },
+          {
+            "type": "integer"
+          },
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Value"
+      }
+    },
+    "required": [
+      "feature",
+      "value",
+      "direction"
+    ],
+    "title": "RiskReason",
+    "type": "object"
+  },
+  "TriageRequest": {
+    "additionalProperties": false,
+    "properties": {
+      "order_id": {
+        "anyOf": [
+          {
+            "maxLength": 64,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Order Id"
+      },
+      "text": {
+        "maxLength": 5000,
+        "minLength": 1,
+        "title": "Text",
+        "type": "string"
+      },
+      "ticket_id": {
+        "maxLength": 64,
+        "minLength": 1,
+        "title": "Ticket Id",
+        "type": "string"
+      }
+    },
+    "required": [
+      "ticket_id",
+      "text"
+    ],
+    "title": "TriageRequest",
+    "type": "object"
+  },
+  "TriageResponse": {
+    "additionalProperties": false,
+    "properties": {
+      "category": {
+        "enum": [
+          "atraso_entrega",
+          "nao_recebido",
+          "produto_errado_ou_incompleto",
+          "produto_defeituoso_ou_qualidade",
+          "diferente_do_anuncio",
+          "atendimento_vendedor",
+          "cancelamento_ou_cobranca",
+          "outro",
+          "sem_problema"
+        ],
+        "title": "Category",
+        "type": "string"
+      },
+      "confidence": {
+        "maximum": 1.0,
+        "minimum": 0.0,
+        "title": "Confidence",
+        "type": "number"
+      },
+      "model": {
+        "title": "Model",
+        "type": "string"
+      },
+      "needs_human_review": {
+        "title": "Needs Human Review",
+        "type": "boolean"
+      },
+      "ticket_id": {
+        "title": "Ticket Id",
+        "type": "string"
+      },
+      "urgency": {
+        "enum": [
+          "alta",
+          "media",
+          "baixa"
+        ],
+        "title": "Urgency",
+        "type": "string"
+      }
+    },
+    "required": [
+      "ticket_id",
+      "category",
+      "urgency",
+      "confidence",
+      "needs_human_review",
+      "model"
+    ],
+    "title": "TriageResponse",
+    "type": "object"
+  }
+}

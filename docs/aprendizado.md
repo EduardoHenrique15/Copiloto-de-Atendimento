@@ -227,3 +227,17 @@ Um prompt pede; o código garante. O LLM pode ignorar uma instrução, mas não 
 
 **Por que os eventos não guardam o texto do cliente?**
 Log é lido por muita gente e fica guardado por muito tempo. O evento registra o tipo ("pii_masked: cpf: 1"), nunca o conteúdo.
+
+### API
+
+**Por que idempotência?**
+O n8n pode reenviar a mesma chamada (queda de rede, reexecução do fluxo). Se `/draft` gerasse um rascunho novo a cada chamada, pagaríamos o LLM duas vezes e o atendente veria dois rascunhos. Com o `ticket_id` como chave, a segunda chamada devolve o que já foi gravado.
+
+**Por que testes de contrato?**
+O n8n depende do formato exato das respostas. Se alguém renomear um campo, o fluxo quebra em produção sem nenhum erro no Python. O snapshot do OpenAPI faz o teste falhar na hora, e a mudança precisa ser intencional.
+
+**Por que guardar o texto já mascarado?**
+O banco é acessado por mais pessoas e processos que o código. Guardar o CPF do cliente lá sem necessidade é risco sem benefício.
+
+**Por que a tabela `llm_calls`?**
+É a base da observabilidade: custo do dia, latência p50 e p95, chamadas com falha. Sem ela, o custo do LLM só aparece na fatura do fim do mês.

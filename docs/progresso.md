@@ -8,7 +8,7 @@
 | 3. Causal e A/B | Concluída | 2026-10-31 |
 | 4. Taxonomia e rotulagem | Em andamento (rotulagem humana) | |
 | 5. Triagem | Código pronto; aguarda o ouro humano | |
-| 6. Copiloto, guardrails e API | Em andamento (parte A: copiloto e guardrails) | |
+| 6. Copiloto, guardrails e API | Em andamento (partes A e B prontas; falta a demonstração real) | |
 | 7. Avaliação | Pendente | |
 | 8. n8n e painel (inclui redesenho visual) | Pendente | |
 | 9. Documentação e entrega | Pendente | |
@@ -138,4 +138,13 @@ Uma segunda execução terminou sem o `KeyboardInterrupt` da primeira (que veio 
 
 **Testes:** `ruff check .` limpo, `ruff format .` aplicado e `pytest`: 169 testes passando, todos com o LLM falso.
 
-**Próximo (parte B):** banco operacional, API (`/triage`, `/draft`, `/feedback`, `/risk/batch`, `/metrics`), idempotência, tabela `llm_calls` e testes de contrato.
+**Parte B: banco, API e métricas**
+- Banco operacional (`src/copiloto/db/`): tickets (texto com dados pessoais já mascarados), rascunhos, decisões, `llm_calls`, eventos de guardrail e grupos do A/B. Migração Alembic `0001`, testada contra os modelos.
+- Serviços (`src/copiloto/services/`): triagem com urgência por regra e revisão humana abaixo de `TRIAGE_MIN_CONFIDENCE`; rascunho; decisão do atendente; lote de risco diário com sorteio do A/B gravado e limite diário no tratamento; métricas da seção 8.6.
+- API FastAPI (`src/copiloto/api/`): `GET /health`, `POST /triage`, `POST /draft`, `POST /feedback`, `POST /risk/batch` e `GET /metrics`. Chave em `X-API-Key`, entrada e saída validadas por Pydantic (campos extras recusados), idempotência em `/triage` e `/draft` (sem nova chamada ao LLM), erros com mensagem clara e sem traceback, e correlation id no cabeçalho.
+- Testes de contrato (`tests/contract/`): formato de cada rota, códigos HTTP, autenticação, idempotência e um snapshot do OpenAPI que falha se o contrato do n8n mudar sem querer.
+- `Dockerfile` e `docker-compose.yml` (API e PostgreSQL), `scripts/demo_api.py` para a demonstração com o LLM real.
+
+**Testes:** `pytest` com todos os testes passando, sempre com o LLM falso.
+
+**Pendência para fechar a fase:** demonstração autorizada com o LLM real (`scripts/demo_api.py --allow-llm`).

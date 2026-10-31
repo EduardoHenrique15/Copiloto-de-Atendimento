@@ -21,6 +21,10 @@ Regra do projeto: toda biblioteca tem uma linha dizendo por que existe. Versões
 | `openai` | SDK para o endpoint compatível com OpenAI (Gemini, Groq): provedor trocável pelo `.env` (Fase 4) |
 | `sentence-transformers`, `transformers`, `torch` | Embeddings multilíngues locais para a triagem (Fase 5), sem custo por chamada. No CI, o `torch` é instalado na versão CPU |
 | `chromadb` | Busca vetorial local das políticas (RAG, Fase 6). Os vetores vêm do nosso embedder; o Chroma só armazena e busca |
+| `fastapi`, `uvicorn` | API da seção 9, com validação Pydantic e documentação OpenAPI automática (Fase 6) |
+| `sqlalchemy` | Acesso ao banco operacional, o mesmo código para PostgreSQL e SQLite (Fase 6) |
+| `alembic` | Migrações versionadas do banco (Fase 6) |
+| `psycopg[binary]` | Driver do PostgreSQL (Fase 6) |
 | `streamlit-shortcuts` | Atalhos de teclado na rotulagem (1 a 9, m, p, z): rotular 350 itens só com o mouse é lento e cansativo |
 | `matplotlib` | Gráficos gerados pelos scripts (curvas PR, confiabilidade, valor e SHAP). Saiu do `requirements-dev.txt` porque os scripts de relatório usam |
 
