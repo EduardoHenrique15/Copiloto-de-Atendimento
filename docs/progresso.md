@@ -8,7 +8,7 @@
 | 3. Causal e A/B | Concluída | 2026-10-31 |
 | 4. Taxonomia e rotulagem | Em andamento (rotulagem humana) | |
 | 5. Triagem | Código pronto; aguarda o ouro humano | |
-| 6. Copiloto, guardrails e API | Em andamento (partes A e B prontas; falta a demonstração real) | |
+| 6. Copiloto, guardrails e API | Concluída | 2026-10-31 |
 | 7. Avaliação | Pendente | |
 | 8. n8n e painel (inclui redesenho visual) | Pendente | |
 | 9. Documentação e entrega | Pendente | |
@@ -127,7 +127,7 @@ Uma segunda execução terminou sem o `KeyboardInterrupt` da primeira (que veio 
 - BERTimbau no Colab.
 - Decisão de produção registrada no ADR 0009 e no model card.
 
-## Fase 6: copiloto, guardrails e API (em andamento)
+## Fase 6: copiloto, guardrails e API (2026-10-31)
 
 **Parte A: copiloto e guardrails**
 - 10 políticas **fictícias** da Loja Exemplo em `policies/` (cada uma com o aviso de ficção e a lista de ações permitidas), divididas em 26 trechos.
@@ -147,4 +147,11 @@ Uma segunda execução terminou sem o `KeyboardInterrupt` da primeira (que veio 
 
 **Testes:** `pytest` com todos os testes passando, sempre com o LLM falso.
 
-**Pendência para fechar a fase:** demonstração autorizada com o LLM real (`scripts/demo_api.py --allow-llm`).
+**Demonstração autorizada com o LLM real** (`scripts/demo_api.py --allow-llm`, 1 chamada):
+- Reclamação real: "Não entregou nem entra contato".
+- Triagem (embeddings + LR, sem LLM): `nao_recebido`, confiança 0,74, urgência média, sem revisão humana.
+- Rascunho: respondeu com base na política citada (`pedido-nao-recebido#resultado-da-investigacao`), sem valores ou prazos inventados, nenhum guardrail disparado, ação `nenhuma`, marcado para revisão humana pelo próprio modelo.
+- Métricas: 1 chamada, latência de 1,87 s, custo de referência R$ 0,0034 (real: R$ 0, plano gratuito).
+- Observação: o rascunho diz "já estamos investigando", uma promessa de ação sem número que o guardrail de promessas não pega. É a limitação já registrada no ADR 0010; a avaliação da Fase 7 mede quantas vezes isso acontece.
+
+**Pendências:** nenhuma desta fase. A qualidade dos rascunhos é medida na Fase 7.
