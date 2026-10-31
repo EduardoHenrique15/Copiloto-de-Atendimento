@@ -156,3 +156,23 @@ Aplicamos um efeito conhecido nos dados históricos, sorteamos os grupos de novo
 - **Resultado surpreendente:** o ajuste quase não mudou a diferença ingênua (44,8 contra 45,3). Eu esperava que mudasse. Isso mostra que os fatores observados (distância, categoria, vendedor) explicam pouco da nota. O atraso domina. Os testes com dados sintéticos provam que o método corrige o viés quando ele existe, então o resultado não vem de um método quebrado.
 - **A/B:** "O contato só se paga se evitar pelo menos 10,5% das negativas. Com 8 pedidos de alto risco por dia, detectar 10% levaria 221 dias. Recomendei desenhar para 20% (57 dias), deixando claro que um efeito perto do mínimo não seria detectado." Isso mostra que o tamanho do teste vem de uma decisão de negócio, não de um número mágico.
 - **Por que simular?** Para provar, antes de gastar com clientes reais, que a análise planejada tem cerca de 5% de falso positivo e que o intervalo de confiança cobre o efeito verdadeiro cerca de 95% das vezes.
+
+## Fase 4: taxonomia e rotulagem humana
+
+**Por que ler 100 comentários antes de rotular?**
+Categorias inventadas na mesa não batem com o que os clientes escrevem. A leitura mostrou três coisas que a lista inicial não previa: muita gente "não recebeu" mesmo com status "entregue"; vários comentários de nota 3 são elogios; cancelamento e falta de estoque não tinham lugar. Ajustar a taxonomia antes de rotular evita refazer o trabalho.
+
+**Por que rótulos humanos?**
+Eles são a verdade usada para medir tudo: a triagem (Fase 5) e o LLM como juiz (Fase 7). Se o LLM gerasse os rótulos "humanos", estaríamos medindo o LLM contra ele mesmo. O conjunto ouro tem 300 comentários: 100 de validação (para ajustar limiares) e 200 de teste (só olhados na comparação final).
+
+**Por que rotular 50 de novo uma semana depois?**
+Para medir a consistência do próprio rotulador (kappa de Cohen). Se eu mesmo discordo de mim em 20% dos casos, nenhum modelo pode passar muito disso, e esse é o teto realista. A semana de intervalo evita lembrar da resposta.
+
+**O que é o kappa?**
+É a concordância descontada do acaso. Concordar 80% parece bom, mas, se quase tudo fosse de uma categoria só, até respostas aleatórias concordariam muito. Kappa 1 é concordância perfeita; 0 é o que o acaso daria. Acima de 0,6 costuma ser considerado bom; acima de 0,8, muito bom.
+
+**Por que a urgência é por regra, e não rotulada?**
+A urgência depende de política da empresa ("dinheiro do cliente envolvido é sempre alta"), não do gosto de quem rotula. Uma regra em código é explicável, testável e muda num lugar só.
+
+**Por que um rótulo principal mais a marcação "mais de um problema"?**
+Multirrótulo deixaria a rotulagem mais lenta e as métricas mais difíceis de explicar. A marcação permite medir, na Fase 5, se a triagem erra mais nesses casos, que é a análise de robustez pedida.

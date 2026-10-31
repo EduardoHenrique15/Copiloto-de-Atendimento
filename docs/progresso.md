@@ -6,7 +6,7 @@
 | 1. Fundação e dados | Concluída | 2026-10-31 |
 | 2. Modelo de risco | Concluída | 2026-10-31 |
 | 3. Causal e A/B | Concluída | 2026-10-31 |
-| 4. Taxonomia e rotulagem | Pendente | |
+| 4. Taxonomia e rotulagem | Em andamento (rotulagem humana) | |
 | 5. Triagem | Pendente | |
 | 6. Copiloto, guardrails e API | Pendente | |
 | 7. Avaliação | Pendente | |
@@ -87,3 +87,19 @@ Uma segunda execução terminou sem o `KeyboardInterrupt` da primeira (que veio 
 
 **Pendências**
 - O registro dos grupos no banco fica para a Fase 6 (`POST /risk/batch`), que usa `assign_group`.
+
+## Fase 4: taxonomia e rotulagem humana (em andamento)
+
+**O que foi feito**
+- Leitura de 100 reclamações sorteadas (`scripts/sample_for_taxonomy.py`, semente 7) e taxonomia fechada com o Eduardo: 9 categorias (ADR 0007).
+- Guia de rótulos com definições, exemplos fictícios, casos de fronteira e a regra de urgência: `data/labels/guia-de-rotulos.md`.
+- `src/copiloto/ai/taxonomy.py` (categorias e urgência por regra) e `src/copiloto/ai/labeling/` (amostragem estratificada, conjunto ouro, kappa).
+- Ferramenta de rotulagem em Streamlit, com atalhos de teclado, pular e desfazer: `src/copiloto/dashboard/labeling_app.py`.
+- `scripts/make_gold_sample.py` (300 itens: 100 validação, 200 teste, 50 para repetir) e `scripts/labeler_agreement.py` (kappa).
+
+**Testes no ambiente de desenvolvimento:** `ruff check .` limpo, `ruff format .` aplicado e `pytest`: 100 testes passando (inclui a ferramenta de rotulagem de ponta a ponta com `AppTest`).
+
+**Pendências para fechar a fase**
+- O Eduardo rotula os 300 itens (rodada 1) e, 7 dias depois, os 50 repetidos (rodada 2).
+- Kappa do rotulador.
+- Conjunto prata com LLM (com autorização e estimativa de custo).

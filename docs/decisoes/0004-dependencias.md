@@ -17,6 +17,8 @@ Regra do projeto: toda biblioteca tem uma linha dizendo por que existe. Versões
 | `shap` | Explicação global e por pedido do modelo de risco (Fase 2). Versão 0.51.0 porque as seguintes exigem Python 3.12 |
 | `joblib` | Salvar e carregar o modelo treinado (Fase 2) |
 | `statsmodels` | Poder estatístico, tamanho de amostra e teste de duas proporções do A/B (Fase 3) |
+| `streamlit` | Ferramenta de rotulagem humana (Fase 4) e painel de métricas (Fase 8) |
+| `streamlit-shortcuts` | Atalhos de teclado na rotulagem (1 a 9, m, p, z): rotular 350 itens só com o mouse é lento e cansativo |
 | `matplotlib` | Gráficos gerados pelos scripts (curvas PR, confiabilidade, valor e SHAP). Saiu do `requirements-dev.txt` porque os scripts de relatório usam |
 
 ## Desenvolvimento (`requirements-dev.txt`)
