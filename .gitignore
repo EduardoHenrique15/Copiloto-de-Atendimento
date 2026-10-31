@@ -1,0 +1,36 @@
+# Segredos
+.env
+.env.*
+!.env.example
+kaggle.json
+
+# Dados e modelos (fora do git)
+data/raw/
+data/processed/
+models/
+n8n_data/
+
+# Caches locais
+.llm_cache/
+.chroma/
+*.duckdb
+*.duckdb.wal
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+*.egg-info/
+
+# dbt
+dbt/target/
+dbt/logs/
+dbt/dbt_packages/
+
+# Sistema
+.DS_Store
+Thumbs.db
