@@ -61,7 +61,7 @@ def test_invalid_output_is_retried_once():
 def test_estimate_counts_calls():
     est = estimate(["texto"] * 45, batch_size=20)
     assert est.calls == 3
-    assert est.input_tokens > 0 and est.output_tokens == 45 * 12
+    assert est.input_tokens > 0 and est.output_tokens == 45 * 40
 
 
 def test_run_respects_max_calls_and_saves_incrementally():

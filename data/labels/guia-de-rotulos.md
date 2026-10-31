@@ -77,6 +77,7 @@ O comentário **não relata problema**: elogio ou comentário neutro, mesmo com 
 | "Ainda não chegou" e o prazo já passou | `nao_recebido` | O cliente ainda não tem o produto. É o problema mais grave. |
 | "Chegou, mas atrasado" | `atraso_entrega` | O produto foi recebido. |
 | "Marcado como entregue, mas não recebi" | `nao_recebido` | Vale o relato do cliente, não o status. |
+| Chegou parte do pedido e "um dos produtos não veio" | `produto_errado_ou_incompleto` | Faltou item: é incompleto, mesmo que o cliente diga "não veio" ou "consta entregue". |
 | Veio outra **cor** que a pedida | `produto_errado_ou_incompleto` | O cliente escolheu uma cor e recebeu outra. |
 | A cor é diferente da **foto do anúncio** (cor única) | `diferente_do_anuncio` | O item é o pedido; o anúncio é que não condiz. |
 | Chegou quebrado por causa da embalagem | `produto_defeituoso_ou_qualidade` | Avaria entra aqui, com ou sem culpa do transporte. |

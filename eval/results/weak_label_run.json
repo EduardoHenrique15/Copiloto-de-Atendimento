@@ -1,0 +1,26 @@
+{
+  "finished_at": "2026-10-31T18:02:10+00:00",
+  "model": "gemini-3.5-flash-lite",
+  "prompt_version": "weak-v2",
+  "batch_size": 20,
+  "this_run": {
+    "calls": 135,
+    "cached": 0,
+    "failed_batches": 0,
+    "input_tokens": 192704,
+    "output_tokens": 105555
+  },
+  "total_labeled": 4000,
+  "label_distribution": {
+    "produto_errado_ou_incompleto": 946,
+    "nao_recebido": 707,
+    "produto_defeituoso_ou_qualidade": 592,
+    "atraso_entrega": 555,
+    "diferente_do_anuncio": 338,
+    "sem_problema": 302,
+    "cancelamento_ou_cobranca": 251,
+    "outro": 235,
+    "atendimento_vendedor": 74
+  },
+  "multiple_problems_rate": 0.27025
+}

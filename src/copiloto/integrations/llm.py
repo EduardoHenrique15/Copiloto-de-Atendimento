@@ -47,7 +47,7 @@ class OpenAICompatibleLLM:
         model: str,
         temperature: float = 0.0,
         cache_dir: Path | None = None,
-        max_retries: int = 3,
+        max_retries: int = 4,
         client: openai.OpenAI | None = None,
     ) -> None:
         self.model = model
@@ -108,13 +108,14 @@ class OpenAICompatibleLLM:
                 result = self._client.chat.completions.create(**kwargs)
                 break
             except (
-                openai.RateLimitError,
+                openai.RateLimitError,  # 429: limite de taxa
+                openai.InternalServerError,  # 5xx: servidor sobrecarregado (ex.: 503)
                 openai.APITimeoutError,
                 openai.APIConnectionError,
             ) as exc:
                 if attempt == self.max_retries:
                     raise ExternalServiceError(f"LLM indisponível: {type(exc).__name__}") from None
-                wait = 2 ** (attempt + 2)
+                wait = 2 ** (attempt + 2)  # 4, 8, 16, 32 s
                 log.warning("llm_retry", attempt=attempt + 1, wait_s=wait, error=type(exc).__name__)
                 time.sleep(wait)
             except openai.APIStatusError as exc:

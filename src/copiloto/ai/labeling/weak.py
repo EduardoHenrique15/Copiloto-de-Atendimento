@@ -15,11 +15,15 @@ from pydantic import BaseModel, ValidationError, field_validator
 from copiloto.ai.taxonomy import CATEGORIES, CATEGORY_KEYS
 from copiloto.integrations.llm import LLMClient, LLMResponse
 
-PROMPT_VERSION = "weak-v1"
+PROMPT_VERSION = "weak-v2"
 CHARS_PER_TOKEN = 3.5  # estimativa conservadora para português
+# Saída medida no piloto (weak-v1): 793 tokens para 20 itens, inclui raciocínio do modelo.
+OUTPUT_TOKENS_PER_ITEM = 40
 
 BORDER_RULES = """\
 - "Ainda não chegou" (mesmo com status entregue) é nao_recebido; "chegou atrasado" é atraso_entrega.
+- Se chegou parte do pedido e faltou um dos itens, é produto_errado_ou_incompleto, mesmo que o
+  cliente diga "não veio" ou "consta como entregue".
 - Outra cor ou tamanho que o pedido é produto_errado_ou_incompleto; diferente da foto ou
   da descrição do anúncio é diferente_do_anuncio; "não é original" é diferente_do_anuncio.
 - Quebrado, amassado, vazando ou má qualidade é produto_defeituoso_ou_qualidade.
@@ -98,7 +102,7 @@ def estimate(texts: list[str], batch_size: int) -> Estimate:
         batch_size=batch_size,
         calls=calls,
         input_tokens=int(calls * system_tokens + text_tokens),
-        output_tokens=int(len(texts) * 12),
+        output_tokens=int(len(texts) * OUTPUT_TOKENS_PER_ITEM),
     )
 
 

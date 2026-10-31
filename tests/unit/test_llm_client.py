@@ -88,6 +88,32 @@ def test_rate_limit_is_retried(tmp_path, monkeypatch):
 
 
 @respx.mock
+def test_overloaded_server_is_retried(tmp_path, monkeypatch):
+    waits = []
+    monkeypatch.setattr("copiloto.integrations.llm.time.sleep", waits.append)
+    route = respx.post(f"{BASE}chat/completions").mock(
+        side_effect=[
+            httpx.Response(503, json={"error": {"message": "sobrecarregado"}}),
+            httpx.Response(503, json={"error": {"message": "sobrecarregado"}}),
+            _ok(),
+        ]
+    )
+    assert _llm(tmp_path, retries=3).complete(MESSAGES).content == '{"status": "ok"}'
+    assert route.call_count == 3
+    assert waits == [4, 8]
+
+
+@respx.mock
+def test_gives_up_after_max_retries(tmp_path, monkeypatch):
+    monkeypatch.setattr("copiloto.integrations.llm.time.sleep", lambda s: None)
+    respx.post(f"{BASE}chat/completions").mock(
+        return_value=httpx.Response(503, json={"error": {"message": "fora do ar"}})
+    )
+    with pytest.raises(ExternalServiceError, match="indisponível"):
+        _llm(tmp_path, retries=2).complete(MESSAGES)
+
+
+@respx.mock
 def test_errors_do_not_leak_details(tmp_path):
     respx.post(f"{BASE}chat/completions").mock(
         return_value=httpx.Response(401, json={"error": {"message": "chave inválida"}})

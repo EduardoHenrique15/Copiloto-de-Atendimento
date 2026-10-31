@@ -100,12 +100,13 @@ Uma segunda execução terminou sem o `KeyboardInterrupt` da primeira (que veio 
 **Testes no ambiente de desenvolvimento:** `ruff check .` limpo, `ruff format .` aplicado e `pytest`: 115 testes passando (inclui a ferramenta de rotulagem de ponta a ponta com `AppTest` e o cliente do LLM com HTTP simulado).
 
 - Rotulagem fraca com LLM pronta para rodar (`scripts/weak_label.py`): 4.000 reclamações (sem as do ouro e as da taxonomia), lotes de 20 por chamada, cache em disco, validação do JSON com Pydantic, retomada de onde parou e estimativa antes de chamar (ADR 0008).
-- Cliente do LLM (`src/copiloto/integrations/llm.py`) com cache, novas tentativas em limite de taxa e erros sem detalhes sensíveis; `ScriptedLLM` para os testes.
+- Cliente do LLM (`src/copiloto/integrations/llm.py`) com cache, novas tentativas em limite de taxa e em erro 5xx, e erros sem detalhes sensíveis; `ScriptedLLM` para os testes.
+- **Conjunto prata gerado** (autorizado pelo Eduardo, depois de estimativa e piloto): 4.000 reclamações, prompt `weak-v2`, 0 lotes inválidos, custo real R$ 0. Distribuição: errado ou incompleto 946, não recebido 707, defeito ou qualidade 592, atraso 555, diferente do anúncio 338, sem problema 302, cancelamento ou cobrança 251, outro 235, atendimento 74. Detalhes no ADR 0008 e em `eval/results/weak_label_run.json`.
 
 **Pendências para fechar a fase**
 - O Eduardo rotula os 300 itens (rodada 1) e, 7 dias depois, os 50 repetidos (rodada 2).
 - Kappa do rotulador.
-- Rodar a rotulagem fraca (com autorização, depois da estimativa).
+- Interpretar o conjunto prata contra o ouro na Fase 5 (concordância do LLM com os rótulos humanos).
 
 ## Plano adicional pedido pelo Eduardo
 

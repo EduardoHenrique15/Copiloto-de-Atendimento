@@ -79,9 +79,14 @@ def main() -> None:
 
     llm = OpenAICompatibleLLM.from_settings(settings)
 
-    def save(batch: pd.DataFrame, _: dict) -> None:
+    progress = {"done": len(done)}
+
+    def save(batch: pd.DataFrame, info: dict) -> None:
         SILVER.parent.mkdir(parents=True, exist_ok=True)
         batch.to_csv(SILVER, mode="a", header=not SILVER.exists(), index=False)
+        progress["done"] += len(batch)
+        origin = "cache" if info["cached"] else f"{info['latency_ms'] / 1000:.1f} s"
+        print(f"{progress['done']}/{len(pool)} rotulados ({origin})", flush=True)
 
     stats = run_weak_labeling(
         llm, todo, args.batch_size, args.max_calls, save, min_interval_s=60 / args.rpm
