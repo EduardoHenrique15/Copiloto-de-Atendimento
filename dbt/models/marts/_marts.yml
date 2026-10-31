@@ -1,0 +1,42 @@
+version: 2
+
+models:
+  - name: fct_orders_risk
+    description: >
+      Pedidos entregues e avaliados, com features disponíveis até a entrega e o
+      alvo is_negative (nota 1 ou 2). Base do modelo de risco (Fase 2).
+    columns:
+      - name: order_id
+        data_tests: [unique, not_null]
+      - name: feature_cutoff_at
+        data_tests: [not_null]
+      - name: is_negative
+        data_tests: [not_null]
+      - name: review_score
+        data_tests:
+          - accepted_values: {arguments: {values: [1, 2, 3, 4, 5], quote: false}}
+      - name: seller_prior_late_rate
+        data_tests:
+          - value_between: {arguments: {min_value: 0, max_value: 1}}
+      - name: seller_prior_avg_score
+        data_tests:
+          - value_between: {arguments: {min_value: 1, max_value: 5}}
+
+  - name: fct_complaints
+    description: Comentários de avaliações com nota até 3, para triagem e copiloto.
+    columns:
+      - name: complaint_id
+        data_tests: [unique, not_null]
+      - name: comment_message
+        data_tests: [not_null]
+      - name: review_score
+        data_tests:
+          - accepted_values: {arguments: {values: [1, 2, 3], quote: false}}
+
+  - name: fct_orders_causal
+    description: Pedidos entregues e avaliados, com tratamento (is_late), resultado e confundidores.
+    columns:
+      - name: order_id
+        data_tests: [unique, not_null]
+      - name: is_late
+        data_tests: [not_null]

@@ -1,0 +1,82 @@
+version: 2
+
+models:
+  - name: stg_orders
+    description: Um pedido por linha, com datas em timestamp.
+    columns:
+      - name: order_id
+        data_tests: [unique, not_null]
+      - name: customer_id
+        data_tests:
+          - not_null
+          - relationships: {arguments: {to: ref('stg_customers'), field: customer_id}}
+      - name: purchased_at
+        data_tests: [not_null]
+      - name: order_status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [delivered, shipped, canceled, unavailable, invoiced, processing, created, approved]
+
+  - name: stg_customers
+    columns:
+      - name: customer_id
+        data_tests: [unique, not_null]
+
+  - name: stg_order_items
+    data_tests:
+      - unique_combination: {arguments: {columns: [order_id, order_item_id]}}
+    columns:
+      - name: order_id
+        data_tests:
+          - not_null
+          - relationships: {arguments: {to: ref('stg_orders'), field: order_id}}
+      - name: product_id
+        data_tests:
+          - relationships: {arguments: {to: ref('stg_products'), field: product_id}}
+      - name: seller_id
+        data_tests:
+          - relationships: {arguments: {to: ref('stg_sellers'), field: seller_id}}
+      - name: price
+        data_tests:
+          - value_between: {arguments: {min_value: 0, max_value: 100000}}
+
+  - name: stg_payments
+    data_tests:
+      - unique_combination: {arguments: {columns: [order_id, payment_sequential]}}
+    columns:
+      - name: order_id
+        data_tests:
+          - not_null
+          - relationships: {arguments: {to: ref('stg_orders'), field: order_id}}
+
+  - name: stg_reviews
+    data_tests:
+      - unique_combination: {arguments: {columns: [review_id, order_id]}}
+    columns:
+      - name: order_id
+        data_tests:
+          - not_null
+          - relationships: {arguments: {to: ref('stg_orders'), field: order_id}}
+      - name: review_score
+        data_tests:
+          - not_null
+          - accepted_values: {arguments: {values: [1, 2, 3, 4, 5], quote: false}}
+
+  - name: stg_products
+    columns:
+      - name: product_id
+        data_tests: [unique, not_null]
+
+  - name: stg_sellers
+    columns:
+      - name: seller_id
+        data_tests: [unique, not_null]
+
+  - name: stg_geolocation
+    description: Várias coordenadas por prefixo de CEP; a média é feita no intermediate.
+
+  - name: stg_category_translation
+    columns:
+      - name: category_name
+        data_tests: [unique, not_null]

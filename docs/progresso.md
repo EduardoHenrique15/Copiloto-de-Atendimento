@@ -3,7 +3,7 @@
 | Fase | Status | Data |
 | --- | --- | --- |
 | 0. Contas e ambiente | Concluída | 2026-10-31 |
-| 1. Fundação e dados | Próxima | |
+| 1. Fundação e dados | Em validação (aguarda dbt na base real e CI) | |
 | 2. Modelo de risco | Pendente | |
 | 3. Causal e A/B | Pendente | |
 | 4. Taxonomia e rotulagem | Pendente | |
@@ -27,3 +27,22 @@
 **Pendências**
 - `TEST_EMAIL_TO`, a credencial de e-mail, o `chat_id` do Telegram e a key e o token do Trello ficam para a Fase 8.
 - O teste do Groq fica para quando a reserva for necessária.
+
+## Fase 1: fundação e dados (em validação)
+
+**O que foi feito**
+- Estrutura de pastas, `pyproject.toml`, `requirements*.txt` com versões fixadas, `.env.example` e LICENSE MIT.
+- `src/copiloto/core/`: configuração (`config.py`), logs JSON com correlation id (`logging.py`), erros (`errors.py`) e custo de LLM em reais (`costs.py`), com testes.
+- Projeto dbt (`dbt/`): 9 modelos de staging, 7 intermediate e 3 marts (`fct_orders_risk`, `fct_complaints`, `fct_orders_causal`), com 46 testes de qualidade.
+- Amostra fictícia em `tests/data/olist/raw` e teste de integração que roda o dbt e confere os marts contra valores calculados à mão, incluindo o histórico as-of do vendedor (anti-vazamento).
+- `scripts/dbt_build.py`, `scripts/eda_resumo.py` e `notebooks/01-exploracao.ipynb`.
+- CI no GitHub Actions: ruff + pytest.
+- ADRs 0003 (DuckDB + dbt) e 0004 (dependências).
+
+**Testes no ambiente de desenvolvimento:** `ruff check .` limpo, `ruff format .` aplicado e `pytest`: 32 testes passando.
+
+**Execução na base real (Windows):** `pytest` com 32 testes passando e `dbt build` com PASS=64, WARN=1, ERROR=0. O aviso é esperado: 4.967 avaliações foram criadas antes da entrega. Números em `docs/eda-resumo.md` e explicados em `docs/aprendizado.md`.
+
+**Pendências para fechar a fase**
+- Na primeira execução, o dbt terminou os 65 passos e depois recebeu um `KeyboardInterrupt` sem ação do usuário. Falta confirmar numa segunda execução.
+- Confirmar o CI verde no GitHub.

@@ -1,0 +1,9 @@
+"review_id","order_id","review_score","review_comment_title","review_comment_message","review_creation_date","review_answer_timestamp"
+"r1","o1",5,,,"2017-01-09 00:00:00","2017-01-10 12:00:00"
+"r2","o2",1,"Atraso","Atrasou muito, e ninguém respondeu
+meus e-mails","2017-01-26 00:00:00","2017-01-27 12:00:00"
+"r3","o3",2,,"Produto veio com defeito","2017-01-28 00:00:00","2017-01-29 12:00:00"
+"r4","o4",3,,"Veio só metade do pedido","2017-02-21 00:00:00","2017-02-22 12:00:00"
+"r5","o5",1,,"Cancelaram sem aviso","2017-02-10 00:00:00","2017-02-11 12:00:00"
+"r6a","o6",4,,"Bom","2017-03-06 00:00:00","2017-03-07 12:00:00"
+"r6b","o6",2,,"   ","2017-03-08 00:00:00","2017-03-09 12:00:00"

@@ -1,0 +1,28 @@
+name: copiloto
+version: "0.1.0"
+config-version: 2
+profile: copiloto
+
+model-paths: ["models"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+target-path: "target"
+clean-targets: ["target", "dbt_packages"]
+
+vars:
+  # Proporção de avaliações sem comentário observada na primeira execução com a base real.
+  # O teste assert_empty_comment_rate_stable avisa se a proporção atual se afastar dela.
+  expected_empty_comment_rate: 0.587
+  empty_comment_rate_tolerance: 0.05
+
+models:
+  copiloto:
+    staging:
+      +materialized: view
+      +schema: staging
+    intermediate:
+      +materialized: table
+      +schema: intermediate
+    marts:
+      +materialized: table
+      +schema: marts

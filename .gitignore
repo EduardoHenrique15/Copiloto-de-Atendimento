@@ -7,8 +7,8 @@ kaggle.json
 # Dados e modelos (fora do git)
 data/raw/
 data/processed/
-models/
-n8n_data/
+/models/
+/n8n_data/
 
 # Caches locais
 .llm_cache/
@@ -29,6 +29,8 @@ venv/
 # dbt
 dbt/target/
 dbt/logs/
+dbt/.user.yml
+logs/
 dbt/dbt_packages/
 
 # Sistema

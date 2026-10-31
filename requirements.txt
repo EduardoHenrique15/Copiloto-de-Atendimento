@@ -1,0 +1,8 @@
+# Dependências de execução. Justificativas em docs/decisoes/0004-dependencias.md.
+pydantic==2.14.2
+pydantic-settings==2.16.2
+structlog==26.1.0
+duckdb==2.0.0
+dbt-core==1.12.6
+dbt-duckdb==1.11.1
+pandas==3.1.0

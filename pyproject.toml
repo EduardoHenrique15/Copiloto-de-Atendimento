@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "copiloto"
+version = "0.1.0"
+description = "Copiloto de atendimento: risco de avaliação negativa, triagem e rascunhos com RAG."
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+license = { text = "MIT" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["dbt/target", "dbt/dbt_packages"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "N"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["integration: testes que rodam o dbt na amostra fictícia (mais lentos)"]
