@@ -30,3 +30,19 @@ Categorias finais: `atraso_entrega`, `nao_recebido`, `produto_errado_ou_incomple
 
 - Definições e casos de fronteira: `data/labels/guia-de-rotulos.md`. O código está em `src/copiloto/ai/taxonomy.py`.
 - `atendimento_vendedor` deve ficar rara. Se tiver menos de cerca de 10 exemplos no ouro, a métrica por categoria será pouco confiável, e isso vai para as limitações.
+
+## Emenda de 2026-11-01: fronteira entre `atraso_entrega` e `nao_recebido`
+
+**Contexto.** Na validação da triagem (Fase 5, 100 itens do ouro), o zero-shot `triage-zs-v1` marcou como `nao_recebido` 6 das 19 reclamações que o Eduardo rotulou como `atraso_entrega`. Nas 6, o cliente diz que o produto ainda não chegou. O prompt seguia o guia ("ainda não chegou e o prazo passou" é `nao_recebido`). Os rótulos humanos seguiam outra leitura, que também era a do conjunto prata (`weak-v2`, ADR 0008).
+
+**Decisão (aprovada pelo Eduardo).** Vale a leitura dos rótulos humanos, e o guia muda:
+- `atraso_entrega`: chegou depois do prazo, **ainda não chegou e o cliente está esperando**, ou reclamação de demora ou prazo longo.
+- `nao_recebido`: o pedido **consta como entregue** e o cliente diz que não recebeu, ou o produto **se perdeu** (extravio, devolvido ao remetente).
+- Urgência: `nao_recebido` passa a ser sempre alta; `atraso_entrega` com mais de 10 dias de atraso também é alta. Assim, o pedido muito atrasado que ainda não chegou continua com urgência alta.
+
+**Por quê.** A nova fronteira é mais fácil de aplicar: depende de o pedido constar como entregue ou perdido, não de quanto o prazo passou. Ela também separa ações diferentes: atraso pede acompanhar a entrega; não recebido pede investigação com a transportadora (política `pedido-nao-recebido`).
+
+**Consequências.**
+- Os rótulos do ouro não mudaram. Mudaram o guia, `src/copiloto/ai/taxonomy.py` (descrições e urgência) e os prompts: `triage-zs-v2` e `weak-v3`.
+- A decisão foi tomada olhando a validação, o que o ADR 0009 permite. O teste continua fechado.
+- O conjunto prata segue em `weak-v2`. Ele já tendia a esta leitura, então não será refeito agora.

@@ -48,3 +48,7 @@ Ajustes antes do lote completo:
 - A regra do item faltando funcionou (o caso do piloto agora sai `produto_errado_ou_incompleto`).
 - Erro sistemático encontrado: quando o produto **ainda não chegou e o prazo já passou** ("consta em trânsito há 19 dias", "a previsão era dia 23, hoje é 29 e nada"), o LLM tende a marcar `atraso_entrega`, enquanto o guia indica `nao_recebido`. Foram 2 casos claros e 1 ambíguo em 40.
 - Decisão: não rotular de novo agora. A confusão `atraso_entrega` × `nao_recebido` será medida contra o ouro humano na Fase 5. Se ela for relevante, um prompt `weak-v3` com essa regra explícita refaz o conjunto prata (cerca de 200 chamadas, com nova autorização).
+
+## Atualização de 2026-11-01
+
+A confusão acima foi medida contra o ouro humano. Os rótulos humanos seguiram a mesma leitura do LLM ("ainda não chegou" é atraso), e o guia foi revisto para essa regra (ADR 0007, emenda). O prompt passou a `weak-v3` com a regra nova, mas **o conjunto prata não foi refeito**: ele continua em `weak-v2`, que já tendia a essa leitura. O texto do `weak-v2` está no histórico do git (commit `352b7bf`).

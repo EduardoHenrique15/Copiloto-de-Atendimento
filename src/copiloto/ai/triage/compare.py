@@ -1,5 +1,6 @@
 """Roda as abordagens no conjunto ouro e monta a comparação."""
 
+import textwrap
 import time
 from collections.abc import Callable
 from pathlib import Path
@@ -18,6 +19,16 @@ from copiloto.ai.triage.metrics import (
 from copiloto.core.costs import LLMPrice, cost_per_thousand_brl
 
 PRED_COLUMNS = ["complaint_id", "pred", "confidence", "latency_ms", "input_tokens", "output_tokens"]
+
+
+def preds_path(results_dir: Path, split: str, approach: str) -> Path:
+    """Arquivo de previsões. O zero-shot leva a versão do prompt no nome: um prompt novo
+    gera previsões novas, e as da versão anterior ficam guardadas."""
+    if approach == "zero_shot":
+        from copiloto.ai.triage.zero_shot import PROMPT_VERSION
+
+        return results_dir / f"triage_preds_{split}_zero_shot_{PROMPT_VERSION}.csv"
+    return results_dir / f"triage_preds_{split}_{approach}.csv"
 
 
 def predict_split(
@@ -147,3 +158,26 @@ def render(split: str, results: dict[str, dict]) -> str:
 def agreement_with_gold(silver_like: pd.Series, gold: pd.Series) -> float:
     """Fração de concordância entre dois vetores de rótulos alinhados."""
     return float(np.mean(silver_like.to_numpy() == gold.to_numpy()))
+
+
+def format_errors(
+    frame: pd.DataFrame, approach: str, human: str | None = None, pred: str | None = None
+) -> str:
+    """Erros de uma abordagem (rótulo humano diferente do previsto), com o texto.
+
+    `frame` tem complaint_id, label, pred, confidence e text. `human` e `pred` filtram um par.
+    """
+    errors = frame[frame["label"] != frame["pred"]]
+    if human:
+        errors = errors[errors["label"] == human]
+    if pred:
+        errors = errors[errors["pred"] == pred]
+    errors = errors.sort_values(["label", "pred"])
+    lines = [f"{approach}: {len(errors)} erros na validação", ""]
+    for i, row in enumerate(errors.itertuples(), start=1):
+        lines.append(
+            f"#{i:02d} humano: {row.label} | previsto: {row.pred} "
+            f"(confiança {row.confidence:.2f}) | id {row.complaint_id[:8]}"
+        )
+        lines.append(textwrap.indent(textwrap.fill(" ".join(str(row.text).split()), 100), "     "))
+    return "\n".join(lines) + "\n"

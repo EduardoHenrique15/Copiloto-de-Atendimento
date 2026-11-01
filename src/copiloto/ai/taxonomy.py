@@ -16,13 +16,15 @@ CATEGORIES: tuple[Category, ...] = (
         "atraso_entrega",
         1,
         "Atraso na entrega",
-        "O produto chegou, mas depois do prazo, ou o cliente reclama da demora ou do prazo longo.",
+        "O produto chegou depois do prazo, ainda não chegou e o cliente está esperando, ou o "
+        "cliente reclama da demora ou do prazo longo.",
     ),
     Category(
         "nao_recebido",
         2,
         "Não recebido",
-        "O cliente diz que ainda não recebeu o produto, mesmo que o status diga entregue.",
+        "O pedido consta como entregue, mas o cliente diz que não recebeu, ou o produto se "
+        "perdeu ou voltou ao remetente.",
     ),
     Category(
         "produto_errado_ou_incompleto",
@@ -80,19 +82,17 @@ ESCALATION_TERMS = ("procon", "reclame aqui", "juizado", "advogado", "processo",
 def urgency(category: str, text: str, delay_days: float | None, order_status: str | None) -> str:
     """Urgência por regra documentada (guia de rótulos, seção "Urgência").
 
-    alta: ameaça de escalar (Procon, justiça), não recebido com status "entregue",
-        não recebido com mais de 10 dias de atraso, ou cobrança/cancelamento.
+    alta: ameaça de escalar (Procon, justiça), não recebido, atraso com mais de 10 dias,
+        ou cobrança/cancelamento.
     media: demais problemas de entrega ou de produto.
     baixa: atendimento isolado, outro e sem problema.
     """
     lowered = text.lower()
     if any(term in lowered for term in ESCALATION_TERMS):
         return "alta"
-    if category == "nao_recebido":
-        if order_status == "delivered" or (delay_days is not None and delay_days > 10):
-            return "alta"
-        return "media"
-    if category == "cancelamento_ou_cobranca":
+    if category in {"nao_recebido", "cancelamento_ou_cobranca"}:
+        return "alta"
+    if category == "atraso_entrega" and delay_days is not None and delay_days > 10:
         return "alta"
     if category in {
         "atraso_entrega",

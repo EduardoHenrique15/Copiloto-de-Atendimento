@@ -205,6 +205,12 @@ Se eu olho o teste, ajusto algo e olho de novo, o teste vira validação, e o n�
 **Roteamento por confiança**
 Não é preciso classificar tudo automaticamente. Se o modelo tem pouca certeza, o ticket vai para uma pessoa. O limiar é escolhido para que os tickets automáticos tenham pelo menos 85% de acerto, e o relatório mostra quantos ficam automáticos (cobertura).
 
+**O que a validação ensinou sobre o guia (2026-11-01)**
+O LLM "errou" 6 atrasos, mas estava seguindo o guia ao pé da letra. Quem divergia do guia era a rotulagem humana. Quando modelo e humano discordam, o primeiro passo é ler os casos: às vezes o erro está na regra, não no modelo. A regra nova ("consta entregue" ou "se perdeu" é não recebido; "ainda não chegou" é atraso) depende de um fato observável, por isso é mais fácil de aplicar do que "o prazo já passou?".
+
+**Por que a confiança do LLM não serve para o roteamento?**
+O LLM disse 0,95 ou mais em 79% dos tickets, mas acertou só 78,5% deles. A confiança que o modelo declara não é calibrada. A probabilidade da regressão logística é mais útil: acima de 0,75, ela acertou 86%.
+
 **Custo de modelos locais**
 "De graça" não existe: o modelo local ocupa uma máquina. Para comparar com o LLM, o tempo de CPU por ticket é multiplicado por uma premissa de preço-hora (R$ 0,50 por hora), registrada no ADR 0009.
 

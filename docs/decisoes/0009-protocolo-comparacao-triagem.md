@@ -26,3 +26,8 @@ A especificação pede comparar três abordagens de triagem (zero-shot com LLM, 
 
 - Se a validação mostrar um problema de prompt, o zero-shot pode ganhar uma nova versão **antes** do teste. Cada versão é registrada.
 - O BERTimbau é desejável, não obrigatório (seção 15 da especificação). Se o Colab não estiver disponível, a comparação fica com duas abordagens, e isso vai para as limitações.
+
+## Registro da validação
+
+- **Rodada 1 (2026-11-01, `triage-zs-v1`):** embeddings + LR com F1 macro 0,560 e acurácia de 65,0%; zero-shot com F1 macro 0,532 e acurácia de 72,0%. O principal erro do zero-shot foi a fronteira `atraso_entrega` × `nao_recebido` (6 de 19 atrasos marcados como não recebido), uma divergência entre o guia e os rótulos humanos. O guia foi revisto (ADR 0007, emenda), e o prompt passou a `triage-zs-v2`.
+- As previsões do zero-shot ficam num arquivo por versão do prompt (`triage_preds_val_zero_shot_<versão>.csv`), para nenhuma versão sobrescrever outra.

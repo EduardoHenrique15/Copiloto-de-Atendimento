@@ -15,13 +15,17 @@ from pydantic import BaseModel, ValidationError, field_validator
 from copiloto.ai.taxonomy import CATEGORIES, CATEGORY_KEYS
 from copiloto.integrations.llm import LLMClient, LLMResponse
 
-PROMPT_VERSION = "weak-v2"
+# weak-v3: regra atraso x não recebido revista (ADR 0007, emenda de 2026-11-01).
+# O conjunto prata atual foi gerado com weak-v2 (texto anterior no histórico do git).
+PROMPT_VERSION = "weak-v3"
 CHARS_PER_TOKEN = 3.5  # estimativa conservadora para português
 # Saída medida no piloto (weak-v1): 793 tokens para 20 itens, inclui raciocínio do modelo.
 OUTPUT_TOKENS_PER_ITEM = 40
 
 BORDER_RULES = """\
-- "Ainda não chegou" (mesmo com status entregue) é nao_recebido; "chegou atrasado" é atraso_entrega.
+- "Ainda não chegou", "estou aguardando" ou "chegou atrasado" é atraso_entrega, mesmo com o
+  prazo vencido. nao_recebido só quando consta entregue e o cliente diz que não recebeu, ou
+  quando o produto se perdeu ou voltou ao remetente.
 - Se chegou parte do pedido e faltou um dos itens, é produto_errado_ou_incompleto, mesmo que o
   cliente diga "não veio" ou "consta como entregue".
 - Outra cor ou tamanho que o pedido é produto_errado_ou_incompleto; diferente da foto ou

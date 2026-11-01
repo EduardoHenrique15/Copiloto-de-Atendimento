@@ -9,6 +9,7 @@ Uso:
 
 A divisão `test` só roda com --final: ela é usada uma única vez, na comparação final.
 As previsões ficam em eval/results/triage_preds_<split>_<abordagem>.csv (retoma se cair).
+No zero-shot, o nome leva a versão do prompt (por exemplo, _zero_shot_triage-zs-v2.csv).
 Uma abordagem só entra na tabela se tiver previsões para todos os itens.
 Previsões do BERTimbau (Colab) entram se o arquivo triage_preds_<split>_bertimbau.csv existir.
 """
@@ -20,7 +21,7 @@ from pathlib import Path
 import pandas as pd
 
 from copiloto.ai.triage import zero_shot
-from copiloto.ai.triage.compare import predict_split, render, summarize
+from copiloto.ai.triage.compare import predict_split, preds_path, render, summarize
 from copiloto.ai.triage.data import load_gold
 from copiloto.ai.triage.embeddings_lr import EmbeddingsLRTriager
 from copiloto.core.config import get_settings
@@ -55,7 +56,7 @@ def main() -> None:
 
     results = {}
     for name in approaches:
-        cache = RESULTS / f"triage_preds_{args.split}_{name}.csv"
+        cache = preds_path(RESULTS, args.split, name)
         if name == "embeddings_lr":
             triager = EmbeddingsLRTriager.load(ROOT / "models" / "triage" / "embeddings_lr.joblib")
             frame = predict_split(triager, gold, cache)

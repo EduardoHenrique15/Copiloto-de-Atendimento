@@ -7,7 +7,7 @@
 | 2. Modelo de risco | Concluída | 2026-10-31 |
 | 3. Causal e A/B | Concluída | 2026-10-31 |
 | 4. Taxonomia e rotulagem | Em andamento (rotulagem humana) | |
-| 5. Triagem | Código pronto; aguarda o ouro humano | |
+| 5. Triagem | Em andamento (validação) | |
 | 6. Copiloto, guardrails e API | Concluída | 2026-10-31 |
 | 7. Avaliação | Pendente | |
 | 8. n8n e painel (inclui redesenho visual) | Pendente | |
@@ -120,8 +120,15 @@ Uma segunda execução terminou sem o `KeyboardInterrupt` da primeira (que veio 
 - `notebooks/02-bertimbau-colab.ipynb`: ajuste fino no Colab, previsões devolvidas para avaliação local.
 - ADR 0009 (protocolo da comparação, definido antes dos resultados).
 
+**Validação no ouro (2026-11-01)**
+- Ouro humano rodada 1 completo: 300 rótulos do Eduardo (`data/labels/gold.csv`).
+- `embeddings_lr`: F1 macro 0,560, acurácia 65,0%; roteamento com confiança mínima 0,75 deixa 36% automático, com 86,1% de acerto.
+- `zero_shot` (`triage-zs-v1`, 100 chamadas autorizadas, R$ 0): F1 macro 0,532, acurácia 72,0%; a confiança informada pelo LLM não chega a 85% de acerto em nenhum limiar.
+- `scripts/show_triage_errors.py` lista os erros da validação com os textos (arquivo fora do git).
+- Erro principal do zero-shot: 6 de 19 `atraso_entrega` humanos marcados como `nao_recebido`. O Eduardo decidiu mudar o guia (ADR 0007, emenda): "ainda não chegou" é atraso; não recebido é "consta entregue e não recebi" ou extravio. Prompt `triage-zs-v2`.
+
 **Pendências**
-- Ouro humano completo (Fase 4) para avaliar na validação e, por último, no teste.
+- Rodar o `triage-zs-v2` na validação (100 chamadas, com autorização).
 - Treinar a triagem por embeddings no PC (baixa o modelo do HuggingFace).
 - Rodar o zero-shot no ouro (com autorização: 100 chamadas na validação e 200 no teste).
 - BERTimbau no Colab.

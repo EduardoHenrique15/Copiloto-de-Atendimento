@@ -15,16 +15,19 @@ Este guia define as 9 categorias da triagem (ADR 0007). Ele vale para a rotulage
 ## Categorias
 
 ### 1. `atraso_entrega`: atraso na entrega
-O produto **chegou**, mas depois do prazo, ou o cliente reclama da **demora** ou do **prazo longo**, mesmo que tenha chegado no prazo.
+O produto **chegou depois do prazo**, **ainda não chegou** e o cliente está esperando (mesmo com o prazo vencido), ou o cliente reclama da **demora** ou do **prazo longo**, mesmo que tenha chegado no prazo.
 - "Chegou, mas 10 dias depois do prometido."
+- "Já passou do prazo e nada. Ainda vai chegar?"
 - "Produto bom, só achei o prazo de entrega longo demais."
 - "Demorou tanto que perdi a data do aniversário."
 
 ### 2. `nao_recebido`: não recebido
-O cliente diz que **ainda não recebeu** o produto. Vale mesmo quando o status do pedido é "entregue".
-- "Até hoje não recebi meu pedido."
+O pedido **consta como entregue**, mas o cliente diz que **não recebeu**, ou o produto **se perdeu** (extravio, devolvido ao remetente).
 - "Consta como entregue, mas ninguém recebeu aqui em casa."
-- "Já passou do prazo e nada. Ainda vai chegar?"
+- "A transportadora disse que o pacote foi extraviado."
+- "O rastreio diz que voltou para o remetente e eu não recebi nada."
+
+*Regra revista em 01/11/2026 (ADR 0007, emenda).* Antes, "ainda não chegou e o prazo passou" era `nao_recebido`.
 
 ### 3. `produto_errado_ou_incompleto`: produto errado ou incompleto
 Chegou **outro item** (outro modelo, cor ou tamanho escolhido), ou **faltou item** do pedido (entrega parcial).
@@ -74,9 +77,10 @@ O comentário **não relata problema**: elogio ou comentário neutro, mesmo com 
 
 | Situação | Rótulo | Por quê |
 | --- | --- | --- |
-| "Ainda não chegou" e o prazo já passou | `nao_recebido` | O cliente ainda não tem o produto. É o problema mais grave. |
+| "Ainda não chegou" ou "estou aguardando", mesmo com o prazo vencido | `atraso_entrega` | O pedido ainda está a caminho. Se passar de 10 dias de atraso, a urgência sobe para alta. |
 | "Chegou, mas atrasado" | `atraso_entrega` | O produto foi recebido. |
 | "Marcado como entregue, mas não recebi" | `nao_recebido` | Vale o relato do cliente, não o status. |
+| Extraviado ou devolvido ao remetente | `nao_recebido` | O pedido não vai mais chegar sozinho. |
 | Chegou parte do pedido e "um dos produtos não veio" | `produto_errado_ou_incompleto` | Faltou item: é incompleto, mesmo que o cliente diga "não veio" ou "consta entregue". |
 | Veio outra **cor** que a pedida | `produto_errado_ou_incompleto` | O cliente escolheu uma cor e recebeu outra. |
 | A cor é diferente da **foto do anúncio** (cor única) | `diferente_do_anuncio` | O item é o pedido; o anúncio é que não condiz. |
@@ -95,6 +99,6 @@ A urgência é calculada por código (`copiloto.ai.taxonomy.urgency`) a partir d
 
 | Urgência | Quando |
 | --- | --- |
-| **alta** | Menção a Procon, Reclame Aqui, juizado, advogado, processo ou justiça; `nao_recebido` com status "entregue" ou com mais de 10 dias de atraso; `cancelamento_ou_cobranca` (dinheiro do cliente envolvido) |
-| **media** | `nao_recebido` nos outros casos; `atraso_entrega`; `produto_errado_ou_incompleto`; `produto_defeituoso_ou_qualidade`; `diferente_do_anuncio` |
+| **alta** | Menção a Procon, Reclame Aqui, juizado, advogado, processo ou justiça; `nao_recebido`; `atraso_entrega` com mais de 10 dias de atraso; `cancelamento_ou_cobranca` (dinheiro do cliente envolvido) |
+| **media** | `atraso_entrega` nos outros casos; `produto_errado_ou_incompleto`; `produto_defeituoso_ou_qualidade`; `diferente_do_anuncio` |
 | **baixa** | `atendimento_vendedor`; `outro`; `sem_problema` |

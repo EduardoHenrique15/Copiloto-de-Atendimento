@@ -33,7 +33,8 @@ def test_taxonomy_has_nine_numbered_categories():
     [
         ("nao_recebido", "não chegou", -5, "delivered", "alta"),
         ("nao_recebido", "não chegou", 12, "shipped", "alta"),
-        ("nao_recebido", "não chegou", 3, "shipped", "media"),
+        ("nao_recebido", "sumiu", 3, "shipped", "alta"),
+        ("atraso_entrega", "ainda não chegou", 12, "shipped", "alta"),
         ("produto_errado_ou_incompleto", "vou ao PROCON", -3, "delivered", "alta"),
         ("cancelamento_ou_cobranca", "não estornaram", None, "canceled", "alta"),
         ("atraso_entrega", "demorou", 5, "delivered", "media"),
