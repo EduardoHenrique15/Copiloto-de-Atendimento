@@ -68,12 +68,14 @@ def summarize(
     price: LLMPrice | None = None,
     cpu_brl_per_hour: float | None = None,
     target_accuracy: float = 0.85,
+    fixed_threshold: float | None = None,
 ) -> dict:
     """Qualidade, latência, custo por 1.000 tickets, robustez e roteamento por confiança.
 
     Custo: abordagens com tokens usam o preço do LLM; as locais usam o tempo de CPU
     medido vezes o preço-hora de uma máquina (premissa documentada).
     Atraso e não recebido contam como uma categoria só (ADR 0007, emenda 2).
+    `fixed_threshold`: limiar já escolhido na validação, aplicado sem mudança (teste).
     """
     frame = frame.assign(
         label=frame["label"].map(triage_eval_key), pred=frame["pred"].map(triage_eval_key)
@@ -97,7 +99,11 @@ def summarize(
         "mean_tokens": {"input": tokens_in, "output": tokens_out},
         "robustness": robustness(frame),
         "coverage_curve": curve,
-        "routing": choose_threshold(curve, target_accuracy),
+        "routing": (
+            choose_threshold(curve, target_accuracy)
+            if fixed_threshold is None
+            else {**fixed_routing(curve, fixed_threshold), "from_validation": True}
+        ),
         "target_accuracy": target_accuracy,
         "mean_confidence_correct": float(frame.loc[correct, "confidence"].mean())
         if correct.any()
@@ -106,6 +112,14 @@ def summarize(
         if (~correct).any()
         else None,
     }
+
+
+def fixed_routing(curve: list[dict], threshold: float) -> dict:
+    """Linha da curva de cobertura no limiar dado (escolhido antes, na validação)."""
+    for row in curve:
+        if abs(row["threshold"] - threshold) < 1e-9:
+            return row
+    raise ValueError(f"Limiar {threshold} fora da grade da curva de cobertura.")
 
 
 def render(split: str, results: dict[str, dict]) -> str:
@@ -135,7 +149,8 @@ def render(split: str, results: dict[str, dict]) -> str:
             f"## {name}",
             "",
             f"Base do custo: {r['cost_basis']}. "
-            f"Roteamento: com confiança mínima {r['routing']['threshold']:.2f}, "
+            f"Roteamento: com confiança mínima {r['routing']['threshold']:.2f}"
+            f"{' (escolhida na validação)' if r['routing'].get('from_validation') else ''}, "
             f"{r['routing']['coverage']:.0%} dos tickets são classificados automaticamente, "
             f"com acurácia de {r['routing']['accuracy_auto']:.1%} "
             f"(meta {r['target_accuracy']:.0%}); o resto vai para revisão humana.",

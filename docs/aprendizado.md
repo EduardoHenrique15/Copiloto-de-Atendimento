@@ -211,6 +211,12 @@ O LLM "errou" 6 atrasos, mas estava seguindo o guia ao pé da letra. Quem diverg
 **Quando o texto não basta (emenda 2)**
 Depois de mudar a regra, o LLM passou a errar no sentido contrário. Lendo os casos, textos quase iguais ("estou aguardando o produto") tinham recebido rótulos diferentes. Se nem o rotulador consegue separar duas categorias pelo texto, nenhum modelo consegue, e insistir no prompt só ajusta o modelo ao ruído da validação. A saída foi usar um dado que separa de verdade: o status do pedido. Pedido ainda a caminho é atraso; pedido que consta entregue e o cliente diz que não recebeu é não recebido. Na métrica, as duas viram `problema_entrega`.
 
+**Por que o limiar do teste vem da validação?**
+O limiar decide quantos tickets vão para uma pessoa. Se ele for escolhido olhando o teste, o teste vira validação de novo, e o número publicado fica otimista. Por isso o script lê o limiar da validação e só mede, no teste, quanto ele cobre e quanto acerta.
+
+**Por que ter uma reserva?**
+O plano gratuito do LLM tem limite diário, e qualquer serviço externo pode cair. Com a reserva, a triagem continua funcionando com o modelo local, que é pior, mas tem um limiar próprio que manda mais tickets para revisão humana.
+
 **Por que a confiança do LLM não serve para o roteamento?**
 O LLM disse 0,95 ou mais em 79% dos tickets, mas acertou só 78,5% deles. A confiança que o modelo declara não é calibrada. A probabilidade da regressão logística é mais útil: acima de 0,75, ela acertou 86%.
 

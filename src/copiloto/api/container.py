@@ -29,6 +29,7 @@ def build_container(settings: Settings) -> Container:
     from copiloto.ai.copilot.retrieve import PolicyRetriever
     from copiloto.ai.triage import zero_shot
     from copiloto.ai.triage.embeddings_lr import EmbeddingsLRTriager, SentenceTransformerEmbedder
+    from copiloto.ai.triage.fallback import FallbackTriager
     from copiloto.core.costs import LLMPrice
     from copiloto.core.errors import ConfigurationError
     from copiloto.db.models import Base
@@ -48,11 +49,13 @@ def build_container(settings: Settings) -> Container:
     embedder = SentenceTransformerEmbedder(settings.embedding_model)
     orders = DuckDBOrders(settings.duckdb_path)
 
+    lr_path = ROOT / "models" / "triage" / "embeddings_lr.joblib"
     if settings.triage_backend == "zero_shot":
         triager, prompt_version = zero_shot.ZeroShotTriager(llm), zero_shot.PROMPT_VERSION
+        if settings.triage_fallback == "embeddings_lr":
+            triager = FallbackTriager(triager, EmbeddingsLRTriager.load(lr_path, embedder))
     elif settings.triage_backend == "embeddings_lr":
-        path = ROOT / "models" / "triage" / "embeddings_lr.joblib"
-        triager, prompt_version = EmbeddingsLRTriager.load(path, embedder), ""
+        triager, prompt_version = EmbeddingsLRTriager.load(lr_path, embedder), ""
     else:
         raise ConfigurationError("TRIAGE_BACKEND bertimbau ainda não é servido pela API.")
 
@@ -81,6 +84,7 @@ def build_container(settings: Settings) -> Container:
             if settings.triage_backend == "zero_shot"
             else "embeddings_lr",
             prompt_version=prompt_version,
+            fallback_min_confidence=settings.triage_fallback_min_confidence,
         ),
         drafting=DraftService(llm, retriever, orders, settings.rag_top_k, price),
         risk=risk,

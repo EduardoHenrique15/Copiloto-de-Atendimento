@@ -54,6 +54,20 @@ def main() -> None:
     price = LLMPrice.from_settings(settings) if settings.usd_brl else None
     approaches = [a.strip() for a in args.approaches.split(",") if a.strip()]
 
+    # No teste, o limiar de cada abordagem é o da validação, sem mudança (ADR 0009, item 9).
+    val_routing = {}
+    if args.split == "test":
+        val_path = RESULTS / "triage_comparison_val.json"
+        if not val_path.exists():
+            raise SystemExit("Rode a validação antes do teste: o limiar vem dela.")
+        val_routing = {
+            n: r["routing"]["threshold"]
+            for n, r in json.loads(val_path.read_text(encoding="utf-8")).items()
+        }
+        missing = [a for a in approaches if a not in val_routing]
+        if missing:
+            raise SystemExit(f"Sem limiar da validação para: {', '.join(missing)}.")
+
     results = {}
     for name in approaches:
         cache = preds_path(RESULTS, args.split, name)
@@ -83,7 +97,11 @@ def main() -> None:
             print(f"{name}: só {len(frame)} de {len(gold)} previsões; fora da tabela.")
             continue
         results[name] = summarize(
-            frame, price, CPU_BRL_PER_HOUR, target_accuracy=args.target_accuracy
+            frame,
+            price,
+            CPU_BRL_PER_HOUR,
+            target_accuracy=args.target_accuracy,
+            fixed_threshold=val_routing.get(name),
         )
 
     if not results:

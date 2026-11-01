@@ -21,6 +21,8 @@ class TriageService:
     price: LLMPrice | None = None
     model_name: str = ""
     prompt_version: str = ""
+    # Limiar de confiança da reserva (quando a abordagem principal falha).
+    fallback_min_confidence: float | None = None
 
     def triage(
         self,
@@ -39,6 +41,11 @@ class TriageService:
         result = self.triager.predict(masked)
         order = self.orders.get(order_id) if order_id else None
         category = resolve_delivery(result.category, (order or {}).get("order_status"))
+        threshold, model = self.min_confidence, self.model_name
+        if result.fallback_source:
+            model = result.fallback_source
+            if self.fallback_min_confidence is not None:
+                threshold = self.fallback_min_confidence
         ticket = Ticket(
             ticket_id=ticket_id,
             order_id=order_id,
@@ -51,8 +58,8 @@ class TriageService:
                 (order or {}).get("order_status"),
             ),
             confidence=result.confidence,
-            needs_human_review=result.confidence < self.min_confidence,
-            model=self.model_name or getattr(self.triager, "name", "desconhecido"),
+            needs_human_review=result.confidence < threshold,
+            model=model or getattr(self.triager, "name", "desconhecido"),
         )
         session.add(ticket)
         if result.input_tokens or result.output_tokens:

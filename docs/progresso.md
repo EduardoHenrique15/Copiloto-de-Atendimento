@@ -130,8 +130,13 @@ Uma segunda execução terminou sem o `KeyboardInterrupt` da primeira (que veio 
 - `zero_shot` (`triage-zs-v2`, 100 chamadas autorizadas, R$ 0): F1 macro 0,505, acurácia 70,0%. O erro inverteu (8 de 12 `nao_recebido` saíram como atraso), e a leitura dos erros mostrou rótulos humanos inconsistentes nessa fronteira.
 - Decisão do Eduardo (ADR 0007, emenda 2): atraso e não recebido contam como `problema_entrega` na métrica (8 categorias), e o status do pedido separa os dois no serviço de triagem.
 
+- Validação com 8 categorias (sem nova chamada): zero-shot F1 macro 0,568 e acurácia de 78,0% (77% automáticos com 87,0% de acerto); embeddings F1 macro 0,562 e acurácia de 67,0% (36% automáticos com 86,1%).
+- **Decisão de produção, antes do teste (ADR 0009):** zero-shot com reserva por embeddings (`ai/triage/fallback.py`), com limiares de 0,95 e 0,75 fixados na validação. BERTimbau fora, por decisão do Eduardo.
+- Correção: no teste, o script agora usa o limiar da validação, sem escolher outro no teste.
+
 **Pendências**
-- Recalcular a validação com 8 categorias (sem nova chamada ao LLM: as previsões estão guardadas).
+- Teste final, uma vez só: 200 chamadas, com autorização.
+- Model card da triagem com os números do teste.
 - Treinar a triagem por embeddings no PC (baixa o modelo do HuggingFace).
 - Rodar o zero-shot no ouro (com autorização: 100 chamadas na validação e 200 no teste).
 - BERTimbau no Colab.

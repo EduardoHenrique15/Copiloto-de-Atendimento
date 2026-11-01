@@ -32,3 +32,15 @@ A especificação pede comparar três abordagens de triagem (zero-shot com LLM, 
 - **Rodada 1 (2026-11-01, `triage-zs-v1`):** embeddings + LR com F1 macro 0,560 e acurácia de 65,0%; zero-shot com F1 macro 0,532 e acurácia de 72,0%. O principal erro do zero-shot foi a fronteira `atraso_entrega` × `nao_recebido` (6 de 19 atrasos marcados como não recebido), uma divergência entre o guia e os rótulos humanos. O guia foi revisto (ADR 0007, emenda), e o prompt passou a `triage-zs-v2`.
 - As previsões do zero-shot ficam num arquivo por versão do prompt (`triage_preds_val_zero_shot_<versão>.csv`), para nenhuma versão sobrescrever outra.
 - **Rodada 2 (2026-11-01, `triage-zs-v2`):** zero-shot com F1 macro 0,505 e acurácia de 70,0% (9 categorias). O erro inverteu: 8 de 12 `nao_recebido` humanos saíram como `atraso_entrega`. A leitura dos erros mostrou rótulos humanos inconsistentes nessa fronteira. Decisão: atraso e não recebido contam juntos na métrica, e o status do pedido separa os dois no serviço (ADR 0007, emenda 2). Os números das rodadas 1 e 2 usam 9 categorias e não se comparam com os seguintes.
+- **Rodada 3 (2026-11-01, `triage-zs-v2`, 8 categorias, sem nova chamada):** zero-shot com F1 macro 0,568 e acurácia de 78,0%; com confiança mínima de 0,95, 77% dos tickets ficam automáticos, com 87,0% de acerto. Embeddings + LR com F1 macro 0,562 e acurácia de 67,0%; com 0,75, 36% automáticos, com 86,1% de acerto.
+
+## Decisão de produção (tomada antes do teste)
+
+Decisão do Eduardo em 2026-11-01, com base só na validação:
+- **Zero-shot (`triage-zs-v2`) com reserva por embeddings + LR.** O zero-shot classifica. Se o LLM falhar (indisponível, cota esgotada ou resposta inválida duas vezes), o embeddings assume (`src/copiloto/ai/triage/fallback.py`).
+- **Limiares de confiança fixados na validação:** 0,95 para o zero-shot e 0,75 para a reserva. No teste, o script aplica esses limiares sem mudança. Antes desta correção, o script escolhia o limiar no próprio teste, o que contrariava o item 9 do protocolo.
+- **Por quê:** o zero-shot deixa 77% dos tickets automáticos com a meta de 85% de acerto, contra 36% do embeddings. Custa R$ 1,64 por 1.000 tickets no preço pago e responde em cerca de 1 s (p95 de 1,8 s), aceitável para uma triagem que não é em tempo real. A reserva evita parar a triagem quando o plano gratuito chega ao limite diário.
+- **BERTimbau:** fica fora da comparação (decisão do Eduardo). Treinado no prata, ele aprenderia os mesmos erros dos rótulos do LLM que o embeddings. Vai para as limitações.
+- **Configuração:** `TRIAGE_BACKEND=zero_shot`, `TRIAGE_MIN_CONFIDENCE=0.95`, `TRIAGE_FALLBACK=embeddings_lr` e `TRIAGE_FALLBACK_MIN_CONFIDENCE=0.75`.
+
+O teste (200 itens, `--final`) roda uma vez, depois desta decisão. Os números do teste vão para `docs/model-cards/triagem-resultados.md` e para o model card da triagem, qualquer que seja o resultado.

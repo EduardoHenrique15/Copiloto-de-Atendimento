@@ -53,6 +53,9 @@ class Settings(BaseSettings):
     # Triagem
     triage_backend: Literal["zero_shot", "embeddings_lr", "bertimbau"] = "embeddings_lr"
     triage_min_confidence: float = Field(default=0.6, ge=0.0, le=1.0)
+    # Reserva quando o LLM falha (só com TRIAGE_BACKEND=zero_shot). ADR 0009.
+    triage_fallback: Literal["none", "embeddings_lr"] = "none"
+    triage_fallback_min_confidence: float = Field(default=0.75, ge=0.0, le=1.0)
 
     # Risco e experimento
     risk_contact_cost_brl: float = Field(default=2.0, ge=0.0)

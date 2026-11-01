@@ -13,6 +13,8 @@ class TriageResult:
     input_tokens: int = 0
     output_tokens: int = 0
     cached: bool = False
+    # Preenchido quando a reserva respondeu no lugar da abordagem principal (nome dela).
+    fallback_source: str = ""
 
 
 class Triager(Protocol):
