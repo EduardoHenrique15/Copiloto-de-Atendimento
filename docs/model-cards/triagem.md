@@ -71,7 +71,7 @@ Na validação (100 itens), o zero-shot teve acurácia de 78,0%, e o embeddings,
 - **Atraso × não recebido:** a separação final entre os dois depende do status do pedido e não foi medida no ouro, porque os rótulos humanos dessa fronteira não são consistentes. Sem número de pedido, vale a categoria do texto.
 - **Categorias raras:** `atendimento_vendedor` (6 casos) e `outro` (7) têm F1 baixo e intervalo muito largo. O zero-shot confunde atendimento com cancelamento (3 de 6). `atendimento_vendedor` só vale quando o atendimento é o único problema, então ela tende a ser rara.
 - **Mais de um problema:** a acurácia cai para 66,7%. O rótulo humano é o problema "principal", que é uma escolha subjetiva.
-- **Um rotulador só:** o ouro foi rotulado por uma pessoa. A concordância consigo mesmo (kappa, rodada 2) ainda vai ser medida, na Fase 4.
+- **Um rotulador só, sem kappa:** o ouro foi rotulado por uma pessoa, e a consistência dela consigo mesma (kappa, rodada 2) não foi medida. Na fronteira entre atraso e não recebido, há sinal de inconsistência (ADR 0007, emenda 2).
 - **Confiança do LLM:** a confiança é declarada pelo próprio modelo e não é calibrada. O limiar de 0,95 foi escolhido na validação porque é o único que atinge a meta de 85%.
 - **Reserva treinada no prata:** o embeddings aprendeu com os rótulos do LLM, inclusive com os erros dele. Sem intervalo de confiança por bootstrap da diferença entre as abordagens, a vantagem de 12 pontos de acurácia em 200 itens pareados deve ser lida como estimativa.
 - **BERTimbau:** ficou fora da comparação (ADR 0009).

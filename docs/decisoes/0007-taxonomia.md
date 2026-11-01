@@ -61,3 +61,7 @@ Categorias finais: `atraso_entrega`, `nao_recebido`, `produto_errado_ou_incomple
 - A divisão final entre atraso e não recebido não é medida no ouro, porque os rótulos humanos dessa fronteira não são consistentes. Fica como limitação no model card.
 - Sem número de pedido, o serviço mantém a categoria do texto.
 - Decisão tomada na validação, como o ADR 0009 permite. O teste continua fechado.
+
+## Nota de 2026-11-01: rodada 2 não realizada
+
+O Eduardo decidiu não fazer a rodada 2 (50 repetidos). O kappa do rotulador não foi medido, e isso está registrado como limitação no model card da triagem e no `progresso.md`.

@@ -6,7 +6,7 @@
 | 1. Fundação e dados | Concluída | 2026-10-31 |
 | 2. Modelo de risco | Concluída | 2026-10-31 |
 | 3. Causal e A/B | Concluída | 2026-10-31 |
-| 4. Taxonomia e rotulagem | Em andamento (rotulagem humana) | |
+| 4. Taxonomia e rotulagem | Concluída, sem o kappa do rotulador | 2026-11-01 |
 | 5. Triagem | Concluída | 2026-11-01 |
 | 6. Copiloto, guardrails e API | Concluída | 2026-10-31 |
 | 7. Avaliação | Em andamento | |
@@ -88,7 +88,7 @@ Uma segunda execução terminou sem o `KeyboardInterrupt` da primeira (que veio 
 **Pendências**
 - O registro dos grupos no banco fica para a Fase 6 (`POST /risk/batch`), que usa `assign_group`.
 
-## Fase 4: taxonomia e rotulagem humana (em andamento)
+## Fase 4: taxonomia e rotulagem humana (2026-11-01)
 
 **O que foi feito**
 - Leitura de 100 reclamações sorteadas (`scripts/sample_for_taxonomy.py`, semente 7) e taxonomia fechada com o Eduardo: 9 categorias (ADR 0007).
@@ -103,10 +103,10 @@ Uma segunda execução terminou sem o `KeyboardInterrupt` da primeira (que veio 
 - Cliente do LLM (`src/copiloto/integrations/llm.py`) com cache, novas tentativas em limite de taxa e em erro 5xx, e erros sem detalhes sensíveis; `ScriptedLLM` para os testes.
 - **Conjunto prata gerado** (autorizado pelo Eduardo, depois de estimativa e piloto): 4.000 reclamações, prompt `weak-v2`, 0 lotes inválidos, custo real R$ 0. Distribuição: errado ou incompleto 946, não recebido 707, defeito ou qualidade 592, atraso 555, diferente do anúncio 338, sem problema 302, cancelamento ou cobrança 251, outro 235, atendimento 74. Detalhes no ADR 0008 e em `eval/results/weak_label_run.json`.
 
-**Pendências para fechar a fase**
-- O Eduardo rotula os 300 itens (rodada 1) e, 7 dias depois, os 50 repetidos (rodada 2).
-- Kappa do rotulador.
-- Interpretar o conjunto prata contra o ouro na Fase 5 (concordância do LLM com os rótulos humanos).
+**Fechamento**
+- Ouro: 300 rótulos humanos da rodada 1 (100 de validação e 200 de teste), todos com categoria válida. Distribuição: errado ou incompleto 71, defeito ou qualidade 52, atraso 51, não recebido 46, cancelamento ou cobrança 22, diferente do anúncio 20, sem problema 19, outro 11, atendimento 8. 30,7% marcados com mais de um problema.
+- O prata foi comparado com o ouro na Fase 5 (ADR 0009).
+- **A rodada 2 (50 repetidos) não foi feita, por decisão do Eduardo.** O kappa do rotulador consigo mesmo **não foi medido**. É um critério da especificação que fica em aberto e entra como limitação. A melhor evidência disponível sobre consistência é indireta: na Fase 5, textos quase iguais receberam rótulos diferentes na fronteira entre atraso e não recebido (ADR 0007, emenda 2). `scripts/labeler_agreement.py` continua pronto, caso a rodada 2 seja feita no futuro.
 
 ## Plano adicional pedido pelo Eduardo
 
@@ -139,7 +139,7 @@ Uma segunda execução terminou sem o `KeyboardInterrupt` da primeira (que veio 
 - Embeddings + LR (reserva): F1 macro 0,639 e acurácia de 71,5%; com 0,75, 47% ficam automáticos, com 86,2% de acerto.
 - Model card: `docs/model-cards/triagem.md`. Tabelas em `docs/model-cards/triagem-resultados.md`. Resultado registrado no ADR 0009.
 
-**Pendências:** nenhuma desta fase. O kappa do rotulador (Fase 4) entra nas limitações do model card quando for medido.
+**Pendências:** nenhuma desta fase.
 
 ## Fase 6: copiloto, guardrails e API (2026-10-31)
 
