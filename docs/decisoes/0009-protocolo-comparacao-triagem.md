@@ -44,3 +44,15 @@ Decisão do Eduardo em 2026-11-01, com base só na validação:
 - **Configuração:** `TRIAGE_BACKEND=zero_shot`, `TRIAGE_MIN_CONFIDENCE=0.95`, `TRIAGE_FALLBACK=embeddings_lr` e `TRIAGE_FALLBACK_MIN_CONFIDENCE=0.75`.
 
 O teste (200 itens, `--final`) roda uma vez, depois desta decisão. Os números do teste vão para `docs/model-cards/triagem-resultados.md` e para o model card da triagem, qualquer que seja o resultado.
+
+## Resultado do teste (2026-11-01, 200 itens, uma execução com `--final`)
+
+| Abordagem | F1 macro | Acurácia | Automáticos (limiar da validação) | Acerto nos automáticos |
+| --- | ---: | ---: | ---: | ---: |
+| Zero-shot `triage-zs-v2` | 0,738 | 83,5% | 75% (0,95) | 92,0% |
+| Embeddings + LR | 0,639 | 71,5% | 47% (0,75) | 86,2% |
+
+- O teste confirma a decisão de produção tomada antes dele. Nenhum ajuste foi feito depois.
+- Transparência: o comando com `--estimate` e `--final` também calculou o embeddings no teste, antes da execução completa. O embeddings é determinístico (mesmas previsões, guardadas em arquivo), e nenhuma decisão foi tomada entre as duas execuções.
+- O p95 de latência do zero-shot no teste (5,0 s) ficou acima do da validação (1,8 s), provavelmente por novas tentativas durante o lote.
+- Model card: `docs/model-cards/triagem.md`.

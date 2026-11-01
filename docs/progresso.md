@@ -7,7 +7,7 @@
 | 2. Modelo de risco | Concluída | 2026-10-31 |
 | 3. Causal e A/B | Concluída | 2026-10-31 |
 | 4. Taxonomia e rotulagem | Em andamento (rotulagem humana) | |
-| 5. Triagem | Em andamento (validação) | |
+| 5. Triagem | Concluída | 2026-11-01 |
 | 6. Copiloto, guardrails e API | Concluída | 2026-10-31 |
 | 7. Avaliação | Pendente | |
 | 8. n8n e painel (inclui redesenho visual) | Pendente | |
@@ -112,7 +112,7 @@ Uma segunda execução terminou sem o `KeyboardInterrupt` da primeira (que veio 
 
 - **Redesenho visual** da ferramenta de rotulagem e do painel de métricas, para não parecerem um Streamlit padrão: identidade visual própria (paleta, tipografia), layout em cartões, hierarquia clara, estados vazios e feedback de ação. Será feito na Fase 8, junto com o painel e antes da gravação do vídeo, e revisado com prints antes de fechar a fase.
 
-## Fase 5: triagem (código adiantado em paralelo à rotulagem)
+## Fase 5: triagem (2026-11-01)
 
 **O que foi feito**
 - `src/copiloto/ai/triage/`: contrato comum (`base.py`), zero-shot com LLM e saída validada (`zero_shot.py`, prompt `triage-zs-v1`, já com a regra "não chegou ainda é `nao_recebido`" vinda da revisão do prata), embeddings + regressão logística (`embeddings_lr.py`), métricas de qualidade, latência, custo, robustez e roteamento por confiança (`metrics.py`, `compare.py`), leitura do prata e do ouro (`data.py`).
@@ -134,13 +134,12 @@ Uma segunda execução terminou sem o `KeyboardInterrupt` da primeira (que veio 
 - **Decisão de produção, antes do teste (ADR 0009):** zero-shot com reserva por embeddings (`ai/triage/fallback.py`), com limiares de 0,95 e 0,75 fixados na validação. BERTimbau fora, por decisão do Eduardo.
 - Correção: no teste, o script agora usa o limiar da validação, sem escolher outro no teste.
 
-**Pendências**
-- Teste final, uma vez só: 200 chamadas, com autorização.
-- Model card da triagem com os números do teste.
-- Treinar a triagem por embeddings no PC (baixa o modelo do HuggingFace).
-- Rodar o zero-shot no ouro (com autorização: 100 chamadas na validação e 200 no teste).
-- BERTimbau no Colab.
-- Decisão de produção registrada no ADR 0009 e no model card.
+**Teste final (200 itens, uma execução com `--final`, 200 chamadas autorizadas, R$ 0)**
+- Zero-shot (produção): F1 macro 0,738 e acurácia de 83,5%; com o limiar da validação (0,95), 75% dos tickets ficam automáticos, com 92,0% de acerto.
+- Embeddings + LR (reserva): F1 macro 0,639 e acurácia de 71,5%; com 0,75, 47% ficam automáticos, com 86,2% de acerto.
+- Model card: `docs/model-cards/triagem.md`. Tabelas em `docs/model-cards/triagem-resultados.md`. Resultado registrado no ADR 0009.
+
+**Pendências:** nenhuma desta fase. O kappa do rotulador (Fase 4) entra nas limitações do model card quando for medido.
 
 ## Fase 6: copiloto, guardrails e API (2026-10-31)
 

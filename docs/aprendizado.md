@@ -211,6 +211,12 @@ O LLM "errou" 6 atrasos, mas estava seguindo o guia ao pé da letra. Quem diverg
 **Quando o texto não basta (emenda 2)**
 Depois de mudar a regra, o LLM passou a errar no sentido contrário. Lendo os casos, textos quase iguais ("estou aguardando o produto") tinham recebido rótulos diferentes. Se nem o rotulador consegue separar duas categorias pelo texto, nenhum modelo consegue, e insistir no prompt só ajusta o modelo ao ruído da validação. A saída foi usar um dado que separa de verdade: o status do pedido. Pedido ainda a caminho é atraso; pedido que consta entregue e o cliente diz que não recebeu é não recebido. Na métrica, as duas viram `problema_entrega`.
 
+**Como contar a triagem em entrevista**
+"No teste com 200 reclamações rotuladas à mão, o LLM zero-shot acertou 83,5%, contra 71,5% de um modelo local treinado com rótulos do próprio LLM. Com um limiar de confiança escolhido antes do teste, 75% dos tickets são classificados sozinhos, com 92% de acerto, e o resto vai para uma pessoa. O custo é de R$ 1,64 por 1.000 tickets. O erro mais interessante não era do modelo: atraso e não recebido não se separam pelo texto, nem para mim, e a solução foi usar o status do pedido."
+
+**Por que o teste foi melhor que a validação?**
+Com 100 itens na validação, cada ticket vale 1 ponto percentual, então a variação é grande. O importante é que a ordem entre as abordagens se manteve e que nada foi ajustado depois de ver o teste.
+
 **Por que o limiar do teste vem da validação?**
 O limiar decide quantos tickets vão para uma pessoa. Se ele for escolhido olhando o teste, o teste vira validação de novo, e o número publicado fica otimista. Por isso o script lê o limiar da validação e só mede, no teste, quanto ele cobre e quanto acerta.
 
