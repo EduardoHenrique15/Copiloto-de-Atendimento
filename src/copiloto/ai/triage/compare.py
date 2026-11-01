@@ -8,6 +8,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from copiloto.ai.taxonomy import TRIAGE_EVAL_KEYS, triage_eval_key
 from copiloto.ai.triage.base import Triager
 from copiloto.ai.triage.metrics import (
     choose_threshold,
@@ -72,7 +73,11 @@ def summarize(
 
     Custo: abordagens com tokens usam o preço do LLM; as locais usam o tempo de CPU
     medido vezes o preço-hora de uma máquina (premissa documentada).
+    Atraso e não recebido contam como uma categoria só (ADR 0007, emenda 2).
     """
+    frame = frame.assign(
+        label=frame["label"].map(triage_eval_key), pred=frame["pred"].map(triage_eval_key)
+    )
     correct = (frame["label"] == frame["pred"]).to_numpy()
     tokens_in = float(frame["input_tokens"].mean())
     tokens_out = float(frame["output_tokens"].mean())
@@ -85,7 +90,7 @@ def summarize(
         cost_basis = "tempo de CPU x preço-hora da máquina"
     curve = coverage_curve(frame["confidence"].to_numpy(dtype=float), correct)
     return {
-        "quality": quality(frame["label"].tolist(), frame["pred"].tolist()),
+        "quality": quality(frame["label"].tolist(), frame["pred"].tolist(), list(TRIAGE_EVAL_KEYS)),
         "latency": latency(frame["latency_ms"].tolist()),
         "cost_per_1000_brl": cost,
         "cost_basis": cost_basis,
@@ -109,6 +114,9 @@ def render(split: str, results: dict[str, dict]) -> str:
         f"# Triagem: comparação no ouro ({split})",
         "",
         "Gerado por `scripts/evaluate_triage.py`. Não edite à mão.",
+        "",
+        "`problema_entrega` junta `atraso_entrega` e `nao_recebido` (ADR 0007, emenda 2): "
+        "o status do pedido separa os dois no serviço.",
         "",
         "| Abordagem | F1 macro | Acurácia | p50 | p95 | R$ / 1.000 tickets |",
         "| --- | ---: | ---: | ---: | ---: | ---: |",
@@ -166,8 +174,10 @@ def format_errors(
     """Erros de uma abordagem (rótulo humano diferente do previsto), com o texto.
 
     `frame` tem complaint_id, label, pred, confidence e text. `human` e `pred` filtram um par.
+    Troca entre atraso e não recebido não conta como erro (ADR 0007, emenda 2).
     """
-    errors = frame[frame["label"] != frame["pred"]]
+    same = frame["label"].map(triage_eval_key) == frame["pred"].map(triage_eval_key)
+    errors = frame[~same]
     if human:
         errors = errors[errors["label"] == human]
     if pred:

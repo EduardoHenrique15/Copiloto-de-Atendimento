@@ -46,3 +46,18 @@ Categorias finais: `atraso_entrega`, `nao_recebido`, `produto_errado_ou_incomple
 - Os rótulos do ouro não mudaram. Mudaram o guia, `src/copiloto/ai/taxonomy.py` (descrições e urgência) e os prompts: `triage-zs-v2` e `weak-v3`.
 - A decisão foi tomada olhando a validação, o que o ADR 0009 permite. O teste continua fechado.
 - O conjunto prata segue em `weak-v2`. Ele já tendia a esta leitura, então não será refeito agora.
+
+## Emenda 2 de 2026-11-01: atraso e não recebido juntos na triagem
+
+**Contexto.** Com o prompt `triage-zs-v2` (regra da emenda 1), o zero-shot passou a errar no sentido contrário: 8 dos 12 `nao_recebido` humanos saíram como `atraso_entrega` (F1 macro 0,505 e acurácia de 70,0%, contra 0,532 e 72,0% da v1). Lendo os erros, textos quase iguais receberam rótulos humanos diferentes: "estou no aguardo do meu produto" e "ainda estou aguardando o produto"; "mais de 40 dias e não foi entregue" e "mais de um mês e não recebi". Pelo texto, quando o produto ainda não chegou, nem o rotulador humano separa os dois de forma consistente. O que separa é um fato que não está no texto: se o pedido consta como entregue.
+
+**Decisão (aprovada pelo Eduardo).**
+1. **Na avaliação da triagem**, `atraso_entrega` e `nao_recebido` contam como uma categoria só, `problema_entrega` (8 categorias na métrica). Rótulos humanos e previsões são convertidos por código; ninguém rotula de novo.
+2. **No serviço de triagem**, o status do pedido decide: se o pedido ainda está a caminho (`created`, `approved`, `processing`, `invoiced` ou `shipped`), `nao_recebido` vira `atraso_entrega`. Se consta entregue, vale o texto, que aí separa bem "chegou atrasado" de "consta entregue, mas não recebi".
+3. As 9 categorias continuam no guia, na ferramenta de rotulagem, no conjunto prata e na API.
+
+**Consequências.**
+- Código: `TRIAGE_MERGE`, `triage_eval_key` e `resolve_delivery` em `src/copiloto/ai/taxonomy.py`; métricas em `ai/triage/compare.py`; regra aplicada em `services/triage.py`.
+- A divisão final entre atraso e não recebido não é medida no ouro, porque os rótulos humanos dessa fronteira não são consistentes. Fica como limitação no model card.
+- Sem número de pedido, o serviço mantém a categoria do texto.
+- Decisão tomada na validação, como o ADR 0009 permite. O teste continua fechado.

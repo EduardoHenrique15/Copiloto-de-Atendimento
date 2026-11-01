@@ -131,17 +131,37 @@ def test_format_errors_lists_only_mistakes_and_filters_pair():
 
     frame = pd.DataFrame(
         {
-            "complaint_id": ["a" * 32, "b" * 32, "c" * 32],
-            "label": ["atraso_entrega", "atraso_entrega", "nao_recebido"],
-            "pred": ["nao_recebido", "atraso_entrega", "outro"],
-            "confidence": [0.9, 0.8, 0.5],
-            "text": ["chegou   tarde", "ok", "não veio"],
+            "complaint_id": ["a" * 32, "b" * 32, "c" * 32, "d" * 32],
+            "label": ["atraso_entrega", "atraso_entrega", "nao_recebido", "outro"],
+            "pred": ["nao_recebido", "atraso_entrega", "outro", "sem_problema"],
+            "confidence": [0.9, 0.8, 0.5, 0.6],
+            "text": ["ainda não chegou", "ok", "não   veio", "elogio"],
         }
     )
     full = format_errors(frame, "zero_shot")
-    assert "2 erros" in full and "chegou tarde" in full and "ok\n" not in full
-    pair = format_errors(frame, "zero_shot", human="atraso_entrega", pred="nao_recebido")
-    assert "1 erros" in pair and "não veio" not in pair
+    assert "2 erros" in full and "não veio" in full and "elogio" in full
+    assert "ainda não chegou" not in full  # atraso x não recebido não é erro (emenda 2)
+    pair = format_errors(frame, "zero_shot", human="nao_recebido", pred="outro")
+    assert "1 erros" in pair and "elogio" not in pair
+
+
+def test_summarize_merges_delivery_categories():
+    frame = pd.DataFrame(
+        {
+            "complaint_id": ["a", "b", "c"],
+            "label": ["atraso_entrega", "nao_recebido", "outro"],
+            "pred": ["nao_recebido", "atraso_entrega", "outro"],
+            "confidence": [0.9, 0.9, 0.9],
+            "latency_ms": [1.0, 1.0, 1.0],
+            "input_tokens": [0, 0, 0],
+            "output_tokens": [0, 0, 0],
+            "multiple_problems": [False, False, False],
+            "text": ["x", "y", "z"],
+        }
+    )
+    q = summarize(frame)["quality"]
+    assert q["accuracy"] == 1.0
+    assert "problema_entrega" in q["per_category"] and "nao_recebido" not in q["per_category"]
 
 
 def test_zero_shot_predictions_file_carries_prompt_version(tmp_path):

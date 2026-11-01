@@ -2,20 +2,14 @@
   "embeddings_lr": {
     "quality": {
       "n": 100,
-      "macro_f1": 0.5601384212495324,
-      "accuracy": 0.65,
+      "macro_f1": 0.5618686868686869,
+      "accuracy": 0.67,
       "per_category": {
-        "atraso_entrega": {
-          "precision": 0.9090909090909091,
-          "recall": 0.5263157894736842,
-          "f1": 0.6666666666666666,
-          "support": 19
-        },
-        "nao_recebido": {
-          "precision": 0.5833333333333334,
-          "recall": 0.5833333333333334,
-          "f1": 0.5833333333333334,
-          "support": 12
+        "problema_entrega": {
+          "precision": 0.8260869565217391,
+          "recall": 0.6129032258064516,
+          "f1": 0.7037037037037037,
+          "support": 31
         },
         "produto_errado_ou_incompleto": {
           "precision": 0.7692307692307693,
@@ -62,8 +56,7 @@
       },
       "confusion": {
         "labels": [
-          "atraso_entrega",
-          "nao_recebido",
+          "problema_entrega",
           "produto_errado_ou_incompleto",
           "produto_defeituoso_ou_qualidade",
           "diferente_do_anuncio",
@@ -74,29 +67,16 @@
         ],
         "matrix": [
           [
-            10,
-            1,
+            19,
             2,
             0,
             0,
             1,
-            4,
+            8,
             1,
             0
           ],
           [
-            1,
-            7,
-            0,
-            0,
-            0,
-            0,
-            4,
-            0,
-            0
-          ],
-          [
-            0,
             2,
             20,
             2,
@@ -107,7 +87,6 @@
             0
           ],
           [
-            0,
             1,
             3,
             12,
@@ -121,7 +100,6 @@
             0,
             0,
             0,
-            0,
             3,
             0,
             0,
@@ -129,7 +107,6 @@
             0
           ],
           [
-            0,
             1,
             0,
             0,
@@ -144,14 +121,12 @@
             0,
             0,
             0,
-            0,
             1,
             4,
             1,
             0
           ],
           [
-            0,
             0,
             1,
             0,
@@ -162,7 +137,6 @@
             0
           ],
           [
-            0,
             0,
             0,
             0,
@@ -201,74 +175,74 @@
       },
       "um problema só": {
         "n": 68,
-        "accuracy": 0.7058823529411765
+        "accuracy": 0.7352941176470589
       }
     },
     "coverage_curve": [
       {
         "threshold": 0.0,
         "coverage": 1.0,
-        "accuracy_auto": 0.65
+        "accuracy_auto": 0.67
       },
       {
         "threshold": 0.05,
         "coverage": 1.0,
-        "accuracy_auto": 0.65
+        "accuracy_auto": 0.67
       },
       {
         "threshold": 0.1,
         "coverage": 1.0,
-        "accuracy_auto": 0.65
+        "accuracy_auto": 0.67
       },
       {
         "threshold": 0.15,
         "coverage": 1.0,
-        "accuracy_auto": 0.65
+        "accuracy_auto": 0.67
       },
       {
         "threshold": 0.2,
         "coverage": 1.0,
-        "accuracy_auto": 0.65
+        "accuracy_auto": 0.67
       },
       {
         "threshold": 0.25,
         "coverage": 0.98,
-        "accuracy_auto": 0.6530612244897959
+        "accuracy_auto": 0.673469387755102
       },
       {
         "threshold": 0.3,
         "coverage": 0.96,
-        "accuracy_auto": 0.6458333333333334
+        "accuracy_auto": 0.6666666666666666
       },
       {
         "threshold": 0.35,
         "coverage": 0.94,
-        "accuracy_auto": 0.6595744680851063
+        "accuracy_auto": 0.6808510638297872
       },
       {
         "threshold": 0.4,
         "coverage": 0.83,
-        "accuracy_auto": 0.6626506024096386
+        "accuracy_auto": 0.6867469879518072
       },
       {
         "threshold": 0.45,
         "coverage": 0.75,
-        "accuracy_auto": 0.68
+        "accuracy_auto": 0.7066666666666667
       },
       {
         "threshold": 0.5,
         "coverage": 0.69,
-        "accuracy_auto": 0.7101449275362319
+        "accuracy_auto": 0.7246376811594203
       },
       {
         "threshold": 0.55,
         "coverage": 0.61,
-        "accuracy_auto": 0.7377049180327869
+        "accuracy_auto": 0.7540983606557377
       },
       {
         "threshold": 0.6,
         "coverage": 0.59,
-        "accuracy_auto": 0.7627118644067796
+        "accuracy_auto": 0.7796610169491526
       },
       {
         "threshold": 0.65,
@@ -312,43 +286,37 @@
       "accuracy_auto": 0.8611111111111112
     },
     "target_accuracy": 0.85,
-    "mean_confidence_correct": 0.709359568128219,
-    "mean_confidence_wrong": 0.5585274577140809
+    "mean_confidence_correct": 0.704158260528721,
+    "mean_confidence_wrong": 0.5599463482697805
   },
   "zero_shot": {
     "quality": {
       "n": 100,
-      "macro_f1": 0.5323481116584565,
-      "accuracy": 0.72,
+      "macro_f1": 0.5680496467134398,
+      "accuracy": 0.78,
       "per_category": {
-        "atraso_entrega": {
-          "precision": 0.8,
-          "recall": 0.42105263157894735,
-          "f1": 0.5517241379310345,
-          "support": 19
-        },
-        "nao_recebido": {
-          "precision": 0.5625,
-          "recall": 0.75,
-          "f1": 0.6428571428571429,
-          "support": 12
+        "problema_entrega": {
+          "precision": 0.8888888888888888,
+          "recall": 0.7741935483870968,
+          "f1": 0.8275862068965517,
+          "support": 31
         },
         "produto_errado_ou_incompleto": {
-          "precision": 0.8666666666666667,
-          "recall": 0.9285714285714286,
-          "f1": 0.896551724137931,
+          "precision": 0.8928571428571429,
+          "recall": 0.8928571428571429,
+          "f1": 0.8928571428571429,
           "support": 28
         },
         "produto_defeituoso_ou_qualidade": {
-          "precision": 1.0,
-          "recall": 0.8947368421052632,
-          "f1": 0.9444444444444444,
+          "precision": 0.9411764705882353,
+          "recall": 0.8421052631578947,
+          "f1": 0.8888888888888888,
           "support": 19
         },
         "diferente_do_anuncio": {
-          "precision": 0.16666666666666666,
-          "recall": 0.3333333333333333,
-          "f1": 0.2222222222222222,
+          "precision": 0.25,
+          "recall": 0.6666666666666666,
+          "f1": 0.36363636363636365,
           "support": 3
         },
         "atendimento_vendedor": {
@@ -358,9 +326,9 @@
           "support": 2
         },
         "cancelamento_ou_cobranca": {
-          "precision": 0.4444444444444444,
+          "precision": 0.5,
           "recall": 0.6666666666666666,
-          "f1": 0.5333333333333333,
+          "f1": 0.5714285714285714,
           "support": 6
         },
         "outro": {
@@ -378,8 +346,7 @@
       },
       "confusion": {
         "labels": [
-          "atraso_entrega",
-          "nao_recebido",
+          "problema_entrega",
           "produto_errado_ou_incompleto",
           "produto_defeituoso_ou_qualidade",
           "diferente_do_anuncio",
@@ -390,34 +357,31 @@
         ],
         "matrix": [
           [
-            8,
-            6,
+            24,
             2,
             0,
             1,
             0,
-            2,
+            4,
+            0,
+            0
+          ],
+          [
+            1,
+            25,
+            1,
+            1,
+            0,
+            0,
             0,
             0
           ],
           [
             0,
-            9,
             0,
-            0,
-            0,
-            0,
+            16,
             3,
             0,
-            0
-          ],
-          [
-            0,
-            1,
-            26,
-            0,
-            1,
-            0,
             0,
             0,
             0
@@ -426,21 +390,9 @@
             0,
             0,
             0,
-            17,
             2,
             0,
             0,
-            0,
-            0
-          ],
-          [
-            0,
-            0,
-            1,
-            0,
-            1,
-            0,
-            0,
             1,
             0
           ],
@@ -451,12 +403,10 @@
             0,
             0,
             0,
-            0,
             1,
             0
           ],
           [
-            0,
             0,
             0,
             0,
@@ -468,7 +418,6 @@
           ],
           [
             1,
-            0,
             1,
             0,
             1,
@@ -478,7 +427,6 @@
             0
           ],
           [
-            0,
             0,
             0,
             0,
@@ -492,15 +440,15 @@
       }
     },
     "latency": {
-      "p50_ms": 1022.1669500024291,
-      "p95_ms": 1663.0293750029523,
-      "mean_ms": 1052.5178660007077
+      "p50_ms": 996.4996499911649,
+      "p95_ms": 1795.2884300058922,
+      "mean_ms": 1220.135032001126
     },
-    "cost_per_1000_brl": 1.640696388,
+    "cost_per_1000_brl": 1.6432822879999998,
     "cost_basis": "tokens x preço do LLM",
     "mean_tokens": {
-      "input": 710.59,
-      "output": 35.28
+      "input": 711.59,
+      "output": 35.35
     },
     "robustness": {
       "curtos (<= 30 caracteres)": {
@@ -513,122 +461,122 @@
       },
       "mais de um problema": {
         "n": 32,
-        "accuracy": 0.625
+        "accuracy": 0.6875
       },
       "um problema só": {
         "n": 68,
-        "accuracy": 0.7647058823529411
+        "accuracy": 0.8235294117647058
       }
     },
     "coverage_curve": [
       {
         "threshold": 0.0,
         "coverage": 1.0,
-        "accuracy_auto": 0.72
+        "accuracy_auto": 0.78
       },
       {
         "threshold": 0.05,
         "coverage": 1.0,
-        "accuracy_auto": 0.72
+        "accuracy_auto": 0.78
       },
       {
         "threshold": 0.1,
         "coverage": 1.0,
-        "accuracy_auto": 0.72
+        "accuracy_auto": 0.78
       },
       {
         "threshold": 0.15,
         "coverage": 1.0,
-        "accuracy_auto": 0.72
+        "accuracy_auto": 0.78
       },
       {
         "threshold": 0.2,
         "coverage": 1.0,
-        "accuracy_auto": 0.72
+        "accuracy_auto": 0.78
       },
       {
         "threshold": 0.25,
         "coverage": 1.0,
-        "accuracy_auto": 0.72
+        "accuracy_auto": 0.78
       },
       {
         "threshold": 0.3,
         "coverage": 1.0,
-        "accuracy_auto": 0.72
+        "accuracy_auto": 0.78
       },
       {
         "threshold": 0.35,
         "coverage": 1.0,
-        "accuracy_auto": 0.72
+        "accuracy_auto": 0.78
       },
       {
         "threshold": 0.4,
         "coverage": 1.0,
-        "accuracy_auto": 0.72
+        "accuracy_auto": 0.78
       },
       {
         "threshold": 0.45,
         "coverage": 1.0,
-        "accuracy_auto": 0.72
+        "accuracy_auto": 0.78
       },
       {
         "threshold": 0.5,
         "coverage": 1.0,
-        "accuracy_auto": 0.72
+        "accuracy_auto": 0.78
       },
       {
         "threshold": 0.55,
         "coverage": 1.0,
-        "accuracy_auto": 0.72
+        "accuracy_auto": 0.78
       },
       {
         "threshold": 0.6,
         "coverage": 1.0,
-        "accuracy_auto": 0.72
+        "accuracy_auto": 0.78
       },
       {
         "threshold": 0.65,
-        "coverage": 0.99,
-        "accuracy_auto": 0.7272727272727273
+        "coverage": 1.0,
+        "accuracy_auto": 0.78
       },
       {
         "threshold": 0.7,
-        "coverage": 0.99,
-        "accuracy_auto": 0.7272727272727273
+        "coverage": 1.0,
+        "accuracy_auto": 0.78
       },
       {
         "threshold": 0.75,
-        "coverage": 0.99,
-        "accuracy_auto": 0.7272727272727273
+        "coverage": 1.0,
+        "accuracy_auto": 0.78
       },
       {
         "threshold": 0.8,
-        "coverage": 0.99,
-        "accuracy_auto": 0.7272727272727273
+        "coverage": 1.0,
+        "accuracy_auto": 0.78
       },
       {
         "threshold": 0.85,
-        "coverage": 0.98,
-        "accuracy_auto": 0.7244897959183674
+        "coverage": 0.99,
+        "accuracy_auto": 0.7878787878787878
       },
       {
         "threshold": 0.9,
-        "coverage": 0.89,
-        "accuracy_auto": 0.7415730337078652
+        "coverage": 0.88,
+        "accuracy_auto": 0.8295454545454546
       },
       {
         "threshold": 0.95,
-        "coverage": 0.79,
-        "accuracy_auto": 0.7848101265822784
+        "coverage": 0.77,
+        "accuracy_auto": 0.8701298701298701
       }
     ],
     "routing": {
       "threshold": 0.95,
-      "coverage": 0.79,
-      "accuracy_auto": 0.7848101265822784
+      "coverage": 0.77,
+      "accuracy_auto": 0.8701298701298701
     },
     "target_accuracy": 0.85,
-    "mean_confidence_correct": 0.9625000000000001,
-    "mean_confidence_wrong": 0.9196428571428569
+    "mean_confidence_correct": 0.9641025641025641,
+    "mean_confidence_wrong": 0.9090909090909091
   }
 }

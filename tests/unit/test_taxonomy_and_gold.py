@@ -123,3 +123,28 @@ def test_self_agreement(tmp_path):
     assert result["disagreements"] == [
         {"complaint_id": "c", "round_1": "atraso_entrega", "round_2": "nao_recebido"}
     ]
+
+
+@pytest.mark.parametrize(
+    ("category", "status", "expected"),
+    [
+        ("nao_recebido", "shipped", "atraso_entrega"),
+        ("nao_recebido", "delivered", "nao_recebido"),
+        ("nao_recebido", None, "nao_recebido"),
+        ("nao_recebido", "canceled", "nao_recebido"),
+        ("atraso_entrega", "delivered", "atraso_entrega"),
+        ("outro", "shipped", "outro"),
+    ],
+)
+def test_resolve_delivery_uses_order_status(category, status, expected):
+    from copiloto.ai.taxonomy import resolve_delivery
+
+    assert resolve_delivery(category, status) == expected
+
+
+def test_triage_eval_keys_merge_delivery():
+    from copiloto.ai.taxonomy import TRIAGE_EVAL_KEYS, triage_eval_key
+
+    assert len(TRIAGE_EVAL_KEYS) == 8
+    assert triage_eval_key("atraso_entrega") == triage_eval_key("nao_recebido")
+    assert triage_eval_key("outro") == "outro"

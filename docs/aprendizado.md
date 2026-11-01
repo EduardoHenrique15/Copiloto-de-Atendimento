@@ -208,6 +208,9 @@ Não é preciso classificar tudo automaticamente. Se o modelo tem pouca certeza,
 **O que a validação ensinou sobre o guia (2026-11-01)**
 O LLM "errou" 6 atrasos, mas estava seguindo o guia ao pé da letra. Quem divergia do guia era a rotulagem humana. Quando modelo e humano discordam, o primeiro passo é ler os casos: às vezes o erro está na regra, não no modelo. A regra nova ("consta entregue" ou "se perdeu" é não recebido; "ainda não chegou" é atraso) depende de um fato observável, por isso é mais fácil de aplicar do que "o prazo já passou?".
 
+**Quando o texto não basta (emenda 2)**
+Depois de mudar a regra, o LLM passou a errar no sentido contrário. Lendo os casos, textos quase iguais ("estou aguardando o produto") tinham recebido rótulos diferentes. Se nem o rotulador consegue separar duas categorias pelo texto, nenhum modelo consegue, e insistir no prompt só ajusta o modelo ao ruído da validação. A saída foi usar um dado que separa de verdade: o status do pedido. Pedido ainda a caminho é atraso; pedido que consta entregue e o cliente diz que não recebeu é não recebido. Na métrica, as duas viram `problema_entrega`.
+
 **Por que a confiança do LLM não serve para o roteamento?**
 O LLM disse 0,95 ou mais em 79% dos tickets, mas acertou só 78,5% deles. A confiança que o modelo declara não é calibrada. A probabilidade da regressão logística é mais útil: acima de 0,75, ela acertou 86%.
 

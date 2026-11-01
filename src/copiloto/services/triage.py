@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from sqlalchemy.orm import Session
 
 from copiloto.ai.guardrails.pii import mask_pii
-from copiloto.ai.taxonomy import urgency
+from copiloto.ai.taxonomy import resolve_delivery, urgency
 from copiloto.ai.triage.base import Triager
 from copiloto.core.costs import LLMPrice
 from copiloto.db.models import Ticket
@@ -38,13 +38,14 @@ class TriageService:
         masked, _ = mask_pii(text)
         result = self.triager.predict(masked)
         order = self.orders.get(order_id) if order_id else None
+        category = resolve_delivery(result.category, (order or {}).get("order_status"))
         ticket = Ticket(
             ticket_id=ticket_id,
             order_id=order_id,
             text_masked=masked,
-            category=result.category,
+            category=category,
             urgency=urgency(
-                result.category,
+                category,
                 masked,
                 (order or {}).get("delay_days"),
                 (order or {}).get("order_status"),

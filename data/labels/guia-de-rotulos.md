@@ -29,6 +29,8 @@ O pedido **consta como entregue**, mas o cliente diz que **não recebeu**, ou o 
 
 *Regra revista em 01/11/2026 (ADR 0007, emenda).* Antes, "ainda não chegou e o prazo passou" era `nao_recebido`.
 
+*Na triagem automática (ADR 0007, emenda 2),* atraso e não recebido são avaliados juntos, e o status do pedido decide entre os dois: pedido ainda a caminho é sempre `atraso_entrega`. A rotulagem humana continua usando as duas categorias.
+
 ### 3. `produto_errado_ou_incompleto`: produto errado ou incompleto
 Chegou **outro item** (outro modelo, cor ou tamanho escolhido), ou **faltou item** do pedido (entrega parcial).
 - "Pedi o tamanho 40 e veio 42."

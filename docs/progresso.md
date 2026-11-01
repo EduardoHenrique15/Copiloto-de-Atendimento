@@ -127,8 +127,11 @@ Uma segunda execução terminou sem o `KeyboardInterrupt` da primeira (que veio 
 - `scripts/show_triage_errors.py` lista os erros da validação com os textos (arquivo fora do git).
 - Erro principal do zero-shot: 6 de 19 `atraso_entrega` humanos marcados como `nao_recebido`. O Eduardo decidiu mudar o guia (ADR 0007, emenda): "ainda não chegou" é atraso; não recebido é "consta entregue e não recebi" ou extravio. Prompt `triage-zs-v2`.
 
+- `zero_shot` (`triage-zs-v2`, 100 chamadas autorizadas, R$ 0): F1 macro 0,505, acurácia 70,0%. O erro inverteu (8 de 12 `nao_recebido` saíram como atraso), e a leitura dos erros mostrou rótulos humanos inconsistentes nessa fronteira.
+- Decisão do Eduardo (ADR 0007, emenda 2): atraso e não recebido contam como `problema_entrega` na métrica (8 categorias), e o status do pedido separa os dois no serviço de triagem.
+
 **Pendências**
-- Rodar o `triage-zs-v2` na validação (100 chamadas, com autorização).
+- Recalcular a validação com 8 categorias (sem nova chamada ao LLM: as previsões estão guardadas).
 - Treinar a triagem por embeddings no PC (baixa o modelo do HuggingFace).
 - Rodar o zero-shot no ouro (com autorização: 100 chamadas na validação e 200 no teste).
 - BERTimbau no Colab.

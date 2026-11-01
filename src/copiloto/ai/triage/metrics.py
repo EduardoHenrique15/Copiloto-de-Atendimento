@@ -10,9 +10,9 @@ SHORT_TEXT_CHARS = 30
 LONG_TEXT_CHARS = 300
 
 
-def quality(y_true: list[str], y_pred: list[str]) -> dict:
+def quality(y_true: list[str], y_pred: list[str], labels: list[str] | None = None) -> dict:
     """F1 macro, acurácia, métricas por categoria e matriz de confusão."""
-    labels = list(CATEGORY_KEYS)
+    labels = list(labels or CATEGORY_KEYS)
     p, r, f, s = precision_recall_fscore_support(y_true, y_pred, labels=labels, zero_division=0)
     return {
         "n": len(y_true),

@@ -76,6 +76,35 @@ CATEGORY_KEYS: tuple[str, ...] = tuple(c.key for c in CATEGORIES)
 BY_KEY = {c.key: c for c in CATEGORIES}
 BY_NUMBER = {c.number: c for c in CATEGORIES}
 
+# Avaliação da triagem (ADR 0007, emenda 2): pelo texto, nem o rotulador humano separa de
+# forma consistente "ainda não chegou" entre atraso e não recebido. As duas categorias
+# viram uma só na métrica, e o status do pedido decide entre elas no serviço.
+DELIVERY_PROBLEM = "problema_entrega"
+TRIAGE_MERGE = {"atraso_entrega": DELIVERY_PROBLEM, "nao_recebido": DELIVERY_PROBLEM}
+TRIAGE_EVAL_KEYS: tuple[str, ...] = (DELIVERY_PROBLEM,) + tuple(
+    k for k in CATEGORY_KEYS if k not in TRIAGE_MERGE
+)
+# Status da Olist em que o pedido ainda está a caminho: nada consta como entregue nem perdido.
+IN_TRANSIT_STATUSES = frozenset({"created", "approved", "processing", "invoiced", "shipped"})
+
+
+def triage_eval_key(category: str) -> str:
+    """Categoria usada na avaliação da triagem (atraso e não recebido juntos)."""
+    return TRIAGE_MERGE.get(category, category)
+
+
+def resolve_delivery(category: str, order_status: str | None) -> str:
+    """Usa o status do pedido para separar atraso de não recebido.
+
+    Pedido ainda a caminho não pode ser "consta entregue e não recebi": vira atraso.
+    Pedido entregue (ou sem status conhecido) mantém a categoria do texto, porque aí o
+    texto separa bem "chegou atrasado" de "consta entregue, mas não recebi".
+    """
+    if category == "nao_recebido" and order_status in IN_TRANSIT_STATUSES:
+        return "atraso_entrega"
+    return category
+
+
 ESCALATION_TERMS = ("procon", "reclame aqui", "juizado", "advogado", "processo", "justiça")
 
 
