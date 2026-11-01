@@ -25,6 +25,7 @@ Regra do projeto: toda biblioteca tem uma linha dizendo por que existe. Versões
 | `sqlalchemy` | Acesso ao banco operacional, o mesmo código para PostgreSQL e SQLite (Fase 6) |
 | `alembic` | Migrações versionadas do banco (Fase 6) |
 | `psycopg[binary]` | Driver do PostgreSQL (Fase 6) |
+| `pyyaml` | Lê os casos de avaliação e de regressão em `eval/*.yaml` (Fase 7). Já vinha com o dbt; agora está fixada de forma explícita. |
 | `streamlit-shortcuts` | Atalhos de teclado na rotulagem (1 a 9, m, p, z): rotular 350 itens só com o mouse é lento e cansativo |
 | `matplotlib` | Gráficos gerados pelos scripts (curvas PR, confiabilidade, valor e SHAP). Saiu do `requirements-dev.txt` porque os scripts de relatório usam |
 

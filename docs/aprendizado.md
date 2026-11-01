@@ -262,3 +262,20 @@ O banco é acessado por mais pessoas e processos que o código. Guardar o CPF do
 
 **Por que a tabela `llm_calls`?**
 É a base da observabilidade: custo do dia, latência p50 e p95, chamadas com falha. Sem ela, o custo do LLM só aparece na fatura do fim do mês.
+
+## Fase 7: avaliação
+
+**Por que casos fictícios?**
+A licença da Olist não permite redistribuir os textos, e os casos ficam no repositório. Escrever os casos também deixa controlar a cobertura: todas as categorias, casos sem política, tentativas de injection e dados pessoais. O custo é que eles podem ser mais fáceis que reclamações reais.
+
+**Por que verificações automáticas e juiz?**
+As verificações automáticas são exatas, mas só olham a estrutura: qual política foi citada e qual ação saiu. O juiz lê o texto e avalia o que é difícil de medir por regra, como fidelidade e tom. Só que o juiz também erra, por isso ele precisa ser validado.
+
+**Por que avaliar à mão antes do juiz?**
+Se eu visse a nota do juiz antes, ela me influenciaria, e a concordância sairia inflada. A ferramenta não mostra o juiz, e o juiz só roda depois.
+
+**Por que a regra de aceitação vem antes?**
+Pelo mesmo motivo do teste da triagem: se eu escolho a regra depois de ver o número, sempre dá para escolher uma que passa.
+
+**Testes de regressão**
+São casos com a resposta do LLM gravada. Eles não medem qualidade: garantem que, se alguém mexer num guardrail, o comportamento antigo não quebra sem ninguém perceber. Por isso rodam no CI, sem custo.

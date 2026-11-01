@@ -9,7 +9,7 @@
 | 4. Taxonomia e rotulagem | Em andamento (rotulagem humana) | |
 | 5. Triagem | Concluída | 2026-11-01 |
 | 6. Copiloto, guardrails e API | Concluída | 2026-10-31 |
-| 7. Avaliação | Pendente | |
+| 7. Avaliação | Em andamento | |
 | 8. n8n e painel (inclui redesenho visual) | Pendente | |
 | 9. Documentação e entrega | Pendente | |
 
@@ -169,3 +169,19 @@ Uma segunda execução terminou sem o `KeyboardInterrupt` da primeira (que veio 
 - Observação: o rascunho diz "já estamos investigando", uma promessa de ação sem número que o guardrail de promessas não pega. É a limitação já registrada no ADR 0010; a avaliação da Fase 7 mede quantas vezes isso acontece.
 
 **Pendências:** nenhuma desta fase. A qualidade dos rascunhos é medida na Fase 7.
+
+## Fase 7: avaliação (em andamento)
+
+**O que foi feito**
+- 60 casos fictícios do copiloto (`eval/copilot_cases.yaml`): 9 categorias, 7 sem política aplicável, 10 tentativas de prompt injection e 3 com dados pessoais inventados.
+- `src/copiloto/ai/eval/`: leitura e validação dos casos, verificações automáticas, juiz LLM com rubrica fixa (`judge-v1`), concordância juiz × humano (kappa), execução incremental e relatório.
+- `scripts/evaluate_copilot.py`: etapas `drafts` e `judge` (cada uma exige `--allow-llm`, com estimativa antes) e relatório em `docs/model-cards/copiloto-avaliacao.md`.
+- Ferramenta de avaliação humana às cegas: `streamlit run src/copiloto/dashboard/copilot_eval_app.py` (40 rascunhos sorteados).
+- Regressão no CI: 8 casos com respostas gravadas (`eval/regression_cases.yaml`, `tests/unit/test_copilot_regression.py`).
+- ADR 0011, com a regra de aceitação do juiz definida antes dos resultados.
+
+**Pendências**
+- Rodar os rascunhos (60 chamadas, com autorização).
+- Avaliação humana dos 40 rascunhos, antes do juiz.
+- Rodar o juiz (60 chamadas, com autorização) e medir a concordância.
+- Resumo no README.
