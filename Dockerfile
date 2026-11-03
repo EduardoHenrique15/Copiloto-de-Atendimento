@@ -3,6 +3,10 @@ FROM python:3.11-slim
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1
 WORKDIR /app
 
+# libgomp1: biblioteca OpenMP de que o LightGBM precisa (não vem na imagem slim).
+RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
 # torch na versão CPU antes do resto, para não baixar a versão com CUDA (vários GB).
 RUN pip install torch==2.15.0 --index-url https://download.pytorch.org/whl/cpu
 COPY requirements.txt .
