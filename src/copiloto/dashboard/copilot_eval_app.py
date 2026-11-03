@@ -17,14 +17,14 @@ import streamlit as st
 from copiloto.ai.copilot.policies import load_policies
 from copiloto.ai.eval.cases import load_cases, select_for_human
 from copiloto.ai.eval.judge import CRITERIA
-from copiloto.ai.eval.run import HUMAN_COLUMNS, read_jsonl
+from copiloto.ai.eval.run import HUMAN_COLUMNS, HUMAN_DRAFT_VERSION, read_jsonl
 from copiloto.dashboard import theme
 
 ROOT = Path(__file__).resolve().parents[3]
 # A variável EVAL_DIR existe só para os testes apontarem para uma pasta temporária.
 EVAL_DIR = Path(os.getenv("EVAL_DIR", ROOT / "eval"))
 CASES = EVAL_DIR / "copilot_cases.yaml"
-DRAFTS = EVAL_DIR / "results" / "copilot_drafts.jsonl"
+DRAFTS = EVAL_DIR / "results" / f"copilot_drafts_{HUMAN_DRAFT_VERSION}.jsonl"
 HUMAN = EVAL_DIR / "human" / "copilot_human.csv"
 LABELS = {"Aprovado": True, "Reprovado": False}
 

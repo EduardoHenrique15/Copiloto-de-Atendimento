@@ -21,4 +21,4 @@ Guardrails: 23.3% dos rascunhos tiveram ao menos um evento; 0.0% tiveram a respo
 | pii_masked | 3 |
 | prompt_injection | 5 |
 
-Custo de referência (preço pago): rascunho R$ 3.20 por 1.000; juiz R$ n/d por 1.000. Latência do rascunho: p50 1400 ms, p95 2067 ms.
+Custo de referência (preço pago): rascunho R$ n/d por 1.000; juiz R$ n/d por 1.000. Latência do rascunho: p50 1400 ms, p95 2067 ms.

@@ -22,6 +22,17 @@ from copiloto.core.costs import LLMPrice, cost_per_thousand_brl
 from copiloto.integrations.llm import LLMClient
 
 HUMAN_COLUMNS = ["case_id", *CRITERIA, "nota", "evaluated_at"]
+# A avaliação humana (eval/human/copilot_human.csv) foi feita sobre os rascunhos desta versão.
+HUMAN_DRAFT_VERSION = "draft-v1"
+
+
+def result_paths(results_dir: Path, version: str) -> dict[str, Path]:
+    """Arquivos de uma versão do copiloto: cada versão tem os seus, para comparar antes e depois."""
+    return {
+        "drafts": results_dir / f"copilot_drafts_{version}.jsonl",
+        "judge": results_dir / f"copilot_judge_{version}.jsonl",
+        "summary": results_dir / f"copilot_eval_{version}.json",
+    }
 
 
 def read_jsonl(path: Path) -> list[dict]:

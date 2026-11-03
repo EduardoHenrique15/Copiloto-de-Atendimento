@@ -1,5 +1,6 @@
 """Lote diário de pedidos de alto risco, com sorteio do A/B registrado no banco."""
 
+import math
 from dataclasses import dataclass
 from datetime import date
 
@@ -37,6 +38,9 @@ class RiskModel:
         return {i: explain_order(values, view, i, top) for i in orders.index}
 
 
+TREATMENT_SHARE = 0.5
+
+
 @dataclass
 class RiskBatchService:
     model: RiskModel
@@ -47,8 +51,11 @@ class RiskBatchService:
     def run(self, session: Session, day: date) -> list[dict]:
         """Pontua os pedidos entregues no dia, sorteia tratamento e controle e grava os grupos.
 
-        Os dois grupos são devolvidos e registrados; só o tratamento é contatado (n8n).
-        O limite diário vale para o tratamento, que é o que gera custo.
+        O limite diário vale para os **dois** grupos, antes do sorteio: entram no experimento
+        os `ceil(max_per_day / 0,5)` pedidos de maior risco. Cortar só o tratamento (como na
+        primeira versão) deixaria o controle com pedidos de risco menor e enviesaria a
+        comparação. Se o sorteio puser no tratamento mais pedidos que o limite, os excedentes
+        continuam no grupo (intenção de tratar), com `contact = False`.
         """
         delivered = self.orders.delivered_on(day)
         if delivered.empty:
@@ -56,6 +63,7 @@ class RiskBatchService:
         delivered = delivered.assign(probability=self.model.score(delivered))
         high = delivered[delivered["probability"] >= self.model.threshold]
         high = high.sort_values("probability", ascending=False)
+        high = high.head(math.ceil(self.max_per_day / TREATMENT_SHARE))
         if high.empty:
             return []
         reasons = self.model.reasons(high)
@@ -64,10 +72,11 @@ class RiskBatchService:
             order_id = str(row["order_id"])
             existing = session.get(ABAssignment, order_id)
             group = existing.group if existing else assign_group(order_id, self.seed)
-            if group == "treatment":
-                if treated >= self.max_per_day:
-                    continue
-                treated += 1
+            if existing is not None:
+                contact = existing.contacted
+            else:
+                contact = group == "treatment" and treated < self.max_per_day
+            treated += contact
             if existing is None:
                 session.add(
                     ABAssignment(
@@ -76,6 +85,7 @@ class RiskBatchService:
                         probability=float(row["probability"]),
                         batch_date=day.isoformat(),
                         seed=self.seed,
+                        contacted=contact,
                     )
                 )
             out.append(
@@ -83,6 +93,7 @@ class RiskBatchService:
                     "order_id": order_id,
                     "probability": round(float(row["probability"]), 4),
                     "group": group,
+                    "contact": contact,
                     "reasons": [
                         {"feature": r["feature"], "value": r["value"], "direction": r["direction"]}
                         for r in reasons[idx]

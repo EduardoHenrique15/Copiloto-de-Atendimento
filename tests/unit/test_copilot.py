@@ -49,6 +49,28 @@ def test_retrieval_finds_refund_policy(retriever):
     assert any(i.startswith("reembolso#") for i in ids)
 
 
+def test_retrieval_always_includes_the_category_policy(retriever):
+    from copiloto.ai.copilot.retrieve import CATEGORY_POLICIES
+
+    for category, policy_ids in CATEGORY_POLICIES.items():
+        chunks = retriever.retrieve("texto sem nenhuma palavra das políticas", category, 4)
+        ids = [c.id for c in chunks]
+        assert any(c.policy_id in policy_ids for c in chunks), category
+        assert len(ids) == len(set(ids))  # sem trecho repetido
+        mandatory = [c for c in chunks if c.policy_id in policy_ids]
+        assert chunks[: len(mandatory)] == mandatory  # a política da categoria vem primeiro
+        assert len(chunks) - len(mandatory) <= 4
+
+
+def test_every_category_policy_exists(retriever):
+    from copiloto.ai.copilot.retrieve import CATEGORY_POLICIES
+    from copiloto.ai.taxonomy import CATEGORY_KEYS
+
+    assert set(CATEGORY_POLICIES) == set(CATEGORY_KEYS)
+    known = {c.policy_id for c in retriever.chunks.values()}
+    assert {p for ids in CATEGORY_POLICIES.values() for p in ids} <= known
+
+
 def _answer(**kw):
     base = {
         "resposta": "Olá! Sentimos muito. O estorno no Pix sai em até 10 dias úteis.",

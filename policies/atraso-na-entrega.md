@@ -1,5 +1,5 @@
 # Atraso na entrega
-<!-- id: atraso-na-entrega | acoes: cupom, escalar -->
+<!-- id: atraso-na-entrega | acoes: cupom, investigar, escalar -->
 > Política fictícia criada para este projeto.
 
 ## Atraso de até 3 dias

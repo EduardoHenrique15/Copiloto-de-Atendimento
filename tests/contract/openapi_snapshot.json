@@ -50,6 +50,7 @@
           "cupom",
           "troca",
           "reembolso",
+          "investigar",
           "escalar"
         ],
         "title": "Suggested Action",
@@ -355,6 +356,10 @@
   "RiskOrder": {
     "additionalProperties": false,
     "properties": {
+      "contact": {
+        "title": "Contact",
+        "type": "boolean"
+      },
       "group": {
         "enum": [
           "treatment",
@@ -385,6 +390,7 @@
       "order_id",
       "probability",
       "group",
+      "contact",
       "reasons"
     ],
     "title": "RiskOrder",

@@ -23,7 +23,7 @@ def app(tmp_path, monkeypatch):
     (eval_dir / "results").mkdir(parents=True)
     shutil.copy(ROOT / "eval" / "copilot_cases.yaml", eval_dir / "copilot_cases.yaml")
     chosen = select_for_human(load_cases(eval_dir / "copilot_cases.yaml"))
-    with (eval_dir / "results" / "copilot_drafts.jsonl").open("w", encoding="utf-8") as f:
+    with (eval_dir / "results" / "copilot_drafts_draft-v1.jsonl").open("w", encoding="utf-8") as f:
         for case_id in chosen[:2]:
             draft = {
                 "case_id": case_id,

@@ -1,5 +1,5 @@
 # Pedido não recebido
-<!-- id: pedido-nao-recebido | acoes: troca, reembolso, escalar -->
+<!-- id: pedido-nao-recebido | acoes: investigar, troca, reembolso, escalar -->
 > Política fictícia criada para este projeto.
 
 ## Investigação

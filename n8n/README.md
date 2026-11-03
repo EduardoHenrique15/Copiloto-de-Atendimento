@@ -4,7 +4,7 @@
 | --- | --- | --- |
 | `workflows/01-triagem.json` | Triagem: `POST /triage`, card no Trello, aviso urgente no Telegram | Webhook `POST /webhook/triagem` |
 | `workflows/02-aprovacao.json` | Aprovação: `POST /draft`, decisão no Telegram, `POST /feedback`, e-mail de teste | Webhook `POST /webhook/aprovacao` (chamado pelo fluxo 1) |
-| `workflows/03-proativo.json` | Contato proativo: `POST /risk/batch` e e-mail só para o grupo `treatment` | Todo dia às 9h |
+| `workflows/03-proativo.json` | Contato proativo: `POST /risk/batch` e e-mail só para os pedidos com `contact = true` (grupo `treatment`, dentro do limite diário) | Todo dia às 9h |
 | `workflows/04-monitoramento.json` | Alertas de custo, latência e guardrails, e relatório semanal | A cada hora; segunda às 8h |
 
 Os fluxos não guardam nenhum segredo:

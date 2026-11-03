@@ -66,6 +66,13 @@ Usamos os 1.458 pedidos elegíveis históricos. Em cada uma de 500 simulações,
 2. Reportar a diferença absoluta, a mudança relativa, o IC 95% e o valor-p.
 3. Uma única análise, no fim da duração fixada. Sem olhar o valor-p no meio do caminho.
 
+## Limite diário e intenção de tratar
+
+O contato tem custo, então há um limite por dia (`PROACTIVE_MAX_PER_DAY`). Ele vale para os **dois** grupos, **antes** do sorteio: entram no experimento os `limite / 0,5` pedidos de maior risco do dia, e só então cada um é sorteado (`copiloto.services.risk`).
+
+- **Por quê:** a primeira versão cortava só o tratamento (os de menor risco dele), e o controle ficava inteiro. Quando o limite entrava em ação, o controle tinha, em média, pedidos de risco menor que o tratamento. Isso é viés de seleção a favor de "o contato não funciona". A correção veio na revisão de 2026-11-01, antes de qualquer execução real do experimento.
+- **Intenção de tratar:** se o sorteio puser no tratamento mais pedidos que o limite, os excedentes continuam no grupo tratamento, com `contacted = false`. A análise compara os grupos como foram sorteados, o que dilui o efeito, mas não o enviesa. A taxa de contato do tratamento é reportada junto.
+
 ## Riscos e mitigações
 
 | Risco | O que acontece | Mitigação |

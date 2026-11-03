@@ -37,6 +37,11 @@ def bind_correlation_id(correlation_id: str | None = None) -> str:
     return cid
 
 
+def current_correlation_id() -> str | None:
+    """Correlation id do contexto atual (o gerado pela API quando o cliente não manda um)."""
+    return structlog.contextvars.get_contextvars().get("correlation_id")
+
+
 def clear_correlation_id() -> None:
     """Remove o correlation id do contexto atual."""
     structlog.contextvars.unbind_contextvars("correlation_id")

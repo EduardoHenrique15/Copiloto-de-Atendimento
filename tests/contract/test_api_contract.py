@@ -122,7 +122,7 @@ def test_feedback_flow(ctx):
     bad = client.post(
         "/feedback", json={"draft_id": draft_id, "decision": "edited", "reviewer": "ana"}, headers=H
     )
-    assert bad.status_code == 409
+    assert bad.status_code == 422  # entrada inválida, não conflito
     ok = client.post(
         "/feedback",
         json={
@@ -160,10 +160,12 @@ def test_risk_batch_contract_assignment_and_cap(ctx):
     assert r.status_code == 200
     data = r.json()
     assert set(data) == {"date", "threshold", "orders"}
-    treated = [o for o in data["orders"] if o["group"] == "treatment"]
-    assert len(treated) <= 3
+    contacted = [o for o in data["orders"] if o["contact"]]
+    assert len(contacted) <= 3
+    assert len(data["orders"]) <= 6  # limite aplicado aos dois grupos antes do sorteio
+    assert all(o["group"] == "treatment" for o in contacted)
     for o in data["orders"]:
-        assert set(o) == {"order_id", "probability", "group", "reasons"}
+        assert set(o) == {"order_id", "probability", "group", "contact", "reasons"}
         assert o["probability"] >= data["threshold"]
     again = client.post("/risk/batch", json={"date": day.isoformat()}, headers=H).json()
     assert [(o["order_id"], o["group"]) for o in again["orders"]] == [
@@ -201,6 +203,17 @@ def test_metrics_report_is_text_from_the_api(ctx):
     assert data["text"].startswith("Relatório da semana")
     assert "Rascunhos:" in data["text"]
     assert client.get("/metrics/report").status_code == 401
+
+
+def test_llm_call_gets_generated_correlation_id(ctx):
+    client, deps = ctx
+    client.post("/triage", json={"ticket_id": "t-cid", "text": "veio faltando"}, headers=H)
+    r = client.post("/draft", json={"ticket_id": "t-cid"}, headers=H)  # sem x-correlation-id
+    from copiloto.db.models import LLMCall
+
+    with deps["engine"].connect() as con:
+        stored = con.execute(select(LLMCall.correlation_id).order_by(LLMCall.id.desc())).first()
+    assert stored[0] == r.headers["x-correlation-id"]
 
 
 def test_correlation_id_is_echoed(ctx):

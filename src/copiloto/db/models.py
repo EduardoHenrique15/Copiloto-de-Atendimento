@@ -102,4 +102,6 @@ class ABAssignment(Base):
     probability: Mapped[float] = mapped_column(Float)
     batch_date: Mapped[str] = mapped_column(String(10), index=True)
     seed: Mapped[int] = mapped_column(Integer)
+    # Intenção de tratar: todo pedido sorteado fica no grupo, mesmo que o contato não aconteça.
+    contacted: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)

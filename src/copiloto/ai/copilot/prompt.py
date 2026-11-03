@@ -4,7 +4,8 @@ import json
 
 from copiloto.ai.copilot.policies import ACTIONS, PolicyChunk
 
-PROMPT_VERSION = "draft-v1"
+# draft-v2: busca híbrida (políticas da categoria sempre entram) e ação "investigar".
+PROMPT_VERSION = "draft-v2"
 
 SYSTEM = f"""Você escreve rascunhos de resposta para o atendimento da Loja Exemplo, uma loja \
 online brasileira. Um atendente humano revisa cada rascunho antes do envio.

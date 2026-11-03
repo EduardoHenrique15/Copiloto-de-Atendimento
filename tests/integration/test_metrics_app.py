@@ -63,11 +63,12 @@ def test_panel_with_tickets_and_results(env):
                 )
             )
         db.commit()
-    for name in ["triage_comparison_test.json", "copilot_eval.json", "risk_metrics.json"]:
+    for name in ["triage_comparison_test.json", "copilot_eval_draft-v1.json", "risk_metrics.json"]:
         shutil.copy(ROOT / "eval" / "results" / name, results / name)
     at = AppTest.from_file(str(APP), default_timeout=30).run()
     assert not at.exception
     text = _texts(at)
     assert "Tickets triados" in text and ">3<" in text
     assert "Triagem: acurácia no teste" in text and "83,5%" in text
-    assert json.loads((results / "copilot_eval.json").read_text())["n_cases"] == 60
+    assert "Copiloto (draft-v1)" in text
+    assert json.loads((results / "copilot_eval_draft-v1.json").read_text())["n_cases"] == 60

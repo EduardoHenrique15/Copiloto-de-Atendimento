@@ -16,7 +16,12 @@ from sqlalchemy.orm import Session
 from copiloto.api import schemas
 from copiloto.api.container import Container
 from copiloto.core.errors import ConfigurationError, ExternalServiceError
-from copiloto.core.logging import bind_correlation_id, clear_correlation_id, get_logger
+from copiloto.core.logging import (
+    bind_correlation_id,
+    clear_correlation_id,
+    current_correlation_id,
+    get_logger,
+)
 from copiloto.services.errors import ConflictError, NotFoundError
 from copiloto.services.feedback import record_feedback
 from copiloto.services.metrics import compute_metrics, report_text
@@ -89,13 +94,13 @@ def create_app(container: Container) -> FastAPI:
         )
 
     @app.post("/triage", response_model=schemas.TriageResponse, dependencies=auth, responses=ERRORS)
-    def triage(body: schemas.TriageRequest, db: Db, request: Request) -> schemas.TriageResponse:
+    def triage(body: schemas.TriageRequest, db: Db) -> schemas.TriageResponse:
         ticket, _ = container.triage.triage(
             db,
             body.ticket_id,
             body.text,
             body.order_id,
-            correlation_id=request.headers.get("x-correlation-id"),
+            correlation_id=current_correlation_id(),
         )
         return schemas.TriageResponse(
             ticket_id=ticket.ticket_id,
@@ -108,10 +113,8 @@ def create_app(container: Container) -> FastAPI:
         )
 
     @app.post("/draft", response_model=schemas.DraftResponse, dependencies=auth, responses=ERRORS)
-    def draft(body: schemas.DraftRequest, db: Db, request: Request) -> schemas.DraftResponse:
-        d, _ = container.drafting.draft(
-            db, body.ticket_id, correlation_id=request.headers.get("x-correlation-id")
-        )
+    def draft(body: schemas.DraftRequest, db: Db) -> schemas.DraftResponse:
+        d, _ = container.drafting.draft(db, body.ticket_id, correlation_id=current_correlation_id())
         return schemas.DraftResponse(
             draft_id=d.draft_id,
             ticket_id=d.ticket_id,

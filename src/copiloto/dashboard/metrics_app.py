@@ -150,7 +150,8 @@ def live_section() -> None:
 def offline_section() -> None:
     theme.section("Qualidade medida offline")
     triage = load_json("triage_comparison_test.json")
-    copilot = load_json("copilot_eval.json")
+    versions = sorted(RESULTS.glob("copilot_eval_*.json"))  # a versão mais nova por último
+    copilot = load_json(versions[-1].name) if versions else None
     risk = load_json("risk_metrics.json")
     cols = st.columns(3)
     with cols[0]:
@@ -169,7 +170,11 @@ def offline_section() -> None:
             hint = f"citação {pct(c['citation']['rate'])}"
             if "agreement" in copilot and copilot["agreement"]["acceptable"]:
                 hint += f" · juiz: {pct(copilot['judge']['all_pass_rate'])} aprovados"
-            theme.card("Copiloto: ação correta", pct(c["action"]["rate"]), hint)
+            theme.card(
+                f"Copiloto ({copilot['draft_prompt']}): ação correta",
+                pct(c["action"]["rate"]),
+                hint,
+            )
         else:
             theme.empty("Copiloto ainda não avaliado")
     with cols[2]:

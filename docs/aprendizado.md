@@ -293,3 +293,11 @@ Com dublês: servidores locais que fingem ser o Telegram, o Trello e o servidor 
 
 **Por que o redesenho?**
 O Streamlit padrão tem cara de protótipo. Uma paleta própria, uma tipografia escolhida, números em fonte monoespaçada e cartões com hierarquia clara fazem o painel parecer um produto, o que conta no vídeo e no portfólio.
+
+## Revisão completa
+
+**Viés escondido num detalhe operacional**
+O limite de contatos por dia parecia só uma regra de custo. Mas, aplicado só ao tratamento, ele tirava do tratamento os pedidos de menor risco e deixava esses mesmos pedidos no controle. Os grupos deixam de ser comparáveis, e o experimento passa a medir o sorteio torto, não o contato. A regra: qualquer filtro precisa ser aplicado **antes** do sorteio, igual para todos.
+
+**Olhar o que o modelo recebeu, não só o que ele respondeu**
+Os rascunhos ruins de atraso pareciam um problema de prompt. Os dados mostraram outra coisa: a política certa nem tinha chegado ao modelo. Gravar os trechos recuperados (`retrieved`) em cada rascunho permitiu medir a busca separada da geração, e estimar a correção sem nenhuma chamada nova ao LLM.

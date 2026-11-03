@@ -26,9 +26,10 @@ A seção 10 pede quatro fluxos no n8n, versionados em JSON e sem segredos, com 
    - O formulário abre em `localhost:5678`, então a decisão é tomada no PC do n8n, sem túnel (ADR 0002).
    - A mensagem escapa os caracteres do Markdown do Telegram (`_`, `*`, `` ` ``, `[`), porque as categorias têm `_`.
 6. **Quem vai para aprovação:** ticket sem revisão humana, sem urgência alta e com problema relatado (não `sem_problema`). Ticket urgente vai para uma pessoa direto, com aviso no Telegram.
-7. **Data simulada no fluxo proativo:** a base é histórica. A data fica nos dados estáticos do fluxo e avança um dia por execução agendada.
-8. **Relatório semanal em texto gerado pela API** (`GET /metrics/report`), sem LLM. O fluxo só repassa o texto.
-9. **A resposta da triagem passou a incluir `text_masked`**, para o atendente ver a reclamação no Telegram sem dados pessoais. O snapshot do contrato foi atualizado.
+7. **Contato proativo pelo campo `contact`:** a API aplica o limite diário aos dois grupos e marca quem deve ser contatado (veja `docs/experimento-ab.md`). O fluxo só filtra.
+8. **Data simulada no fluxo proativo:** a base é histórica. A data fica nos dados estáticos do fluxo e avança um dia por execução agendada.
+9. **Relatório semanal em texto gerado pela API** (`GET /metrics/report`), sem LLM. O fluxo só repassa o texto.
+10. **A resposta da triagem passou a incluir `text_masked`**, para o atendente ver a reclamação no Telegram sem dados pessoais. O snapshot do contrato foi atualizado.
 
 ## Como foi testado
 

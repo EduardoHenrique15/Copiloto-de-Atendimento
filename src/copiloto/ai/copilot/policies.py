@@ -4,7 +4,8 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
-ACTIONS = ("nenhuma", "cupom", "troca", "reembolso", "escalar")
+# "investigar" entrou no draft-v2: abrir investigação com a transportadora não é escalar.
+ACTIONS = ("nenhuma", "cupom", "troca", "reembolso", "investigar", "escalar")
 META_RE = re.compile(r"<!--\s*id:\s*([\w-]+)\s*\|\s*acoes:\s*([^>]*?)\s*-->")
 FICTION_NOTICE = "Política fictícia criada para este projeto"
 

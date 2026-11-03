@@ -3,7 +3,7 @@
 from datetime import date
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 Category = Literal[
     "atraso_entrega",
@@ -48,7 +48,7 @@ class DraftResponse(Strict):
     ticket_id: str
     response: str
     policies_cited: list[str]
-    suggested_action: Literal["nenhuma", "cupom", "troca", "reembolso", "escalar"]
+    suggested_action: Literal["nenhuma", "cupom", "troca", "reembolso", "investigar", "escalar"]
     needs_human: bool
     guardrail_flags: list[str]
 
@@ -58,6 +58,12 @@ class FeedbackRequest(Strict):
     decision: Literal["approved", "edited", "rejected"]
     final_text: str | None = Field(default=None, max_length=5000)
     reviewer: str = Field(min_length=1, max_length=64)
+
+    @model_validator(mode="after")
+    def edited_needs_text(self) -> "FeedbackRequest":
+        if self.decision == "edited" and not (self.final_text or "").strip():
+            raise ValueError("final_text é obrigatório quando decision = edited")
+        return self
 
 
 class FeedbackResponse(Strict):
@@ -80,6 +86,8 @@ class RiskOrder(Strict):
     order_id: str
     probability: float = Field(ge=0, le=1)
     group: Literal["treatment", "control"]
+    # Só os pedidos com contact = true recebem contato (o n8n filtra por este campo).
+    contact: bool
     reasons: list[RiskReason]
 
 

@@ -175,7 +175,7 @@ Uma segunda execução terminou sem o `KeyboardInterrupt` da primeira (que veio 
 **O que foi feito**
 - 60 casos fictícios do copiloto (`eval/copilot_cases.yaml`): 9 categorias, 7 sem política aplicável, 10 tentativas de prompt injection e 3 com dados pessoais inventados.
 - `src/copiloto/ai/eval/`: leitura e validação dos casos, verificações automáticas, juiz LLM com rubrica fixa (`judge-v1`), concordância juiz × humano (kappa), execução incremental e relatório.
-- `scripts/evaluate_copilot.py`: etapas `drafts` e `judge` (cada uma exige `--allow-llm`, com estimativa antes) e relatório em `docs/model-cards/copiloto-avaliacao.md`.
+- `scripts/evaluate_copilot.py`: etapas `drafts` e `judge` (cada uma exige `--allow-llm`, com estimativa antes) e relatório em `docs/model-cards/copiloto-avaliacao-<versão>.md`.
 - Ferramenta de avaliação humana às cegas: `streamlit run src/copiloto/dashboard/copilot_eval_app.py` (40 rascunhos sorteados).
 - Regressão no CI: 8 casos com respostas gravadas (`eval/regression_cases.yaml`, `tests/unit/test_copilot_regression.py`).
 - ADR 0011, com a regra de aceitação do juiz definida antes dos resultados.
@@ -208,3 +208,29 @@ Uma segunda execução terminou sem o `KeyboardInterrupt` da primeira (que veio 
 - Credenciais no n8n, `chat_id` do Telegram, listas e código do quadro do Trello, `TEST_EMAIL_TO` e senha de app do Gmail.
 - Importar e ativar os fluxos e simular 2 reclamações (com autorização: cerca de 4 chamadas ao LLM).
 - Critério de pronto da especificação: uma reclamação percorre triagem, rascunho, aprovação e e-mail; o fluxo proativo registra grupos; o alerta dispara com o limite forçado.
+
+## Revisão completa (2026-11-01)
+
+Revisão de todo o repositório: código, testes, números publicados, documentação, segurança e design.
+
+**Corrigido**
+- **A/B: viés de seleção no limite diário.**
+  - O limite cortava só o grupo tratamento, e o controle ficava com risco médio menor.
+  - Agora o limite vale para os dois grupos antes do sorteio, com intenção de tratar e a coluna `contacted` (migração `0002`). O fluxo 3 do n8n filtra por `contact`.
+  - Detalhes em `docs/experimento-ab.md`.
+- **Copiloto `draft-v2`.**
+  - Busca híbrida: a política da categoria sempre entra. A busca só vetorial deixou de trazer a política de atraso em 4 de 8 casos.
+  - Nova ação `investigar` (ADR 0011, atualização).
+  - Arquivos da avaliação versionados por versão do copiloto. Os números do `draft-v1` não mudaram.
+- **API.**
+  - `llm_calls.correlation_id` agora recebe o id gerado pela API quando o cliente não manda um.
+  - `edited` sem texto final devolve 422 (entrada inválida), e não 409.
+
+**Conferido sem problema**
+- Nenhum segredo, `.env`, `kaggle.json` ou dado bruto da Olist em todo o histórico do git.
+- Os números publicados nos documentos batem com os JSON gerados pelos scripts (risco, causal, A/B e triagem).
+
+**Em aberto**
+- README ainda da Fase 1 (vai ser refeito na Fase 9).
+- 47 dos 60 rascunhos do `draft-v1` foram marcados para revisão humana, em geral porque o próprio LLM pede. Isso será medido de novo no `draft-v2`.
+- Juiz: validar no `draft-v1` e, se for aceito, rodar no `draft-v2` (com autorização).

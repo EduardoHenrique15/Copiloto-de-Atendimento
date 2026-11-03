@@ -3,7 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "content": "## Fluxo 3: contato proativo\nTodo dia às 9h, pede à API o lote de risco da data simulada (`POST /risk/batch`). A API sorteia e grava os grupos do A/B. Só o grupo `treatment` recebe e-mail, no máximo `PROACTIVE_MAX_PER_DAY`, e sempre para TEST_EMAIL_TO.\n\nCredenciais: Copiloto API, E-mail de teste.",
+        "content": "## Fluxo 3: contato proativo\nTodo dia às 9h, pede à API o lote de risco da data simulada (`POST /risk/batch`). A API sorteia e grava os grupos do A/B. Só os pedidos com `contact = true` (grupo `treatment`, até `PROACTIVE_MAX_PER_DAY`) recebem e-mail, sempre para TEST_EMAIL_TO.\n\nCredenciais: Copiloto API, E-mail de teste.",
         "height": 300,
         "width": 420
       },
@@ -77,7 +77,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Só o grupo treatment recebe contato; o control não recebe nada (a API já gravou os dois).\nconst batch = $input.first().json;\nconst max = Number($env.PROACTIVE_MAX_PER_DAY || 20);\nreturn batch.orders\n  .filter(o => o.group === 'treatment')\n  .slice(0, max)\n  .map(o => ({ json: {\n    order_id: o.order_id,\n    date: batch.date,\n    probability: o.probability,\n    reasons: o.reasons.map(r => `${r.feature} (${r.direction})`).join(', '),\n  }}));"
+        "jsCode": "// A API já aplicou o limite diário aos dois grupos e marcou quem deve ser contatado\n// (contact = true, sempre do grupo treatment). O controle não recebe nada.\nconst batch = $input.first().json;\nreturn batch.orders\n  .filter(o => o.contact)\n  .map(o => ({ json: {\n    order_id: o.order_id,\n    date: batch.date,\n    probability: o.probability,\n    reasons: o.reasons.map(r => `${r.feature} (${r.direction})`).join(', '),\n  }}));"
       },
       "id": "f5ef7ed4-9eab-582f-ac9a-b14b08d24ee0",
       "name": "Grupo tratamento",

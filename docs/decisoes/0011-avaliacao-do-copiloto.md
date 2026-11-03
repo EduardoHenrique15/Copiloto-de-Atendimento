@@ -44,7 +44,22 @@ A seção 8.5 da especificação pede 60 casos de avaliação do copiloto, um LL
 ## Consequências
 
 - **Resultados:**
-  - `eval/results/copilot_drafts.jsonl`, `copilot_judge.jsonl` e `copilot_eval.json`;
-  - relatório em `docs/model-cards/copiloto-avaliacao.md`;
+  - `eval/results/copilot_drafts_<versão>.jsonl`, `copilot_judge_<versão>.jsonl` e `copilot_eval_<versão>.json`;
+  - relatório em `docs/model-cards/copiloto-avaliacao-<versão>.md`;
   - avaliação humana em `eval/human/copilot_human.csv`.
 - **Os casos são fictícios e escritos por quem fez o sistema.** Eles podem ser mais fáceis que reclamações reais. Isso vai para as limitações.
+
+## Atualização de 2026-11-01 (revisão): draft-v2
+
+A leitura dos rascunhos do `draft-v1` e das observações da avaliação humana mostrou dois problemas de desenho, não de prompt:
+
+1. **Busca de políticas.**
+   - A busca só vetorial trouxe ao menos uma política esperada em 47 de 53 casos (os 7 sem política ficam fora da conta).
+   - Em 4 dos 8 casos de atraso, a política "Atraso na entrega" nem chegou ao redator. Sem ela, o rascunho não tinha como oferecer o cupom nem citar a regra.
+   - O `draft-v2` usa busca híbrida: os trechos da política principal da categoria sempre entram (`CATEGORY_POLICIES` em `ai/copilot/retrieve.py`), mais 4 da busca vetorial.
+   - Com os trechos que o `draft-v1` recuperou, a busca híbrida teria acertado 52 de 53. A estimativa é offline e vem do campo `retrieved` dos rascunhos.
+2. **Ação "investigar".**
+   - Abrir investigação com a transportadora é o que a política de pedido não recebido manda fazer, mas não existia essa ação. O redator escolhia "escalar" ou "nenhuma", e a avaliação humana reprovou a ação em 6 casos por isso.
+   - `investigar` entrou na lista de ações, permitida pelas políticas de pedido não recebido e de atraso.
+
+**Versões e arquivos.** Cada versão tem os seus arquivos (`copilot_*_<versão>`), para comparar antes e depois. A avaliação humana vale para o `draft-v1`. Por isso, o juiz é validado no `draft-v1` (`--version draft-v1`) e, se for aceito, mede também o `draft-v2`. Rodar o `draft-v2` exige nova autorização: 60 chamadas para os rascunhos e 60 para o juiz.

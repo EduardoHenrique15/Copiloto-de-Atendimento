@@ -5,9 +5,12 @@ Uso (cada etapa pede autorização com --allow-llm; sem ela, só mostra a estima
     python scripts/evaluate_copilot.py --stage drafts --allow-llm
     python scripts/evaluate_copilot.py --stage judge --allow-llm
     python scripts/evaluate_copilot.py            # só refaz o relatório, sem chamar o LLM
+    python scripts/evaluate_copilot.py --version draft-v1 --stage judge --allow-llm
 
-Tudo é gravado caso a caso em eval/results/ (retoma se cair). A avaliação humana dos 40
-rascunhos é feita em: streamlit run src/copiloto/dashboard/copilot_eval_app.py
+Cada versão do copiloto (PROMPT_VERSION) tem os seus arquivos em eval/results/
+(copilot_drafts_<versão>.jsonl etc.), gravados caso a caso (retoma se cair). Rascunhos só
+podem ser gerados para a versão atual do código. A avaliação humana (draft-v1) foi feita em:
+streamlit run src/copiloto/dashboard/copilot_eval_app.py
 """
 
 import argparse
@@ -15,11 +18,19 @@ import json
 from pathlib import Path
 
 from copiloto.ai.copilot.policies import load_policies
-from copiloto.ai.copilot.prompt import SYSTEM
+from copiloto.ai.copilot.prompt import PROMPT_VERSION, SYSTEM
 from copiloto.ai.eval.cases import load_cases
 from copiloto.ai.eval.judge import system_prompt as judge_system_prompt
 from copiloto.ai.eval.report import render
-from copiloto.ai.eval.run import load_human, read_jsonl, run_drafts, run_judge, summarize
+from copiloto.ai.eval.run import (
+    HUMAN_DRAFT_VERSION,
+    load_human,
+    read_jsonl,
+    result_paths,
+    run_drafts,
+    run_judge,
+    summarize,
+)
 from copiloto.core.config import get_settings
 from copiloto.core.costs import LLMPrice, llm_cost_brl
 from copiloto.core.logging import configure_logging
@@ -27,8 +38,6 @@ from copiloto.core.logging import configure_logging
 ROOT = Path(__file__).resolve().parents[1]
 CASES = ROOT / "eval" / "copilot_cases.yaml"
 RESULTS = ROOT / "eval" / "results"
-DRAFTS = RESULTS / "copilot_drafts.jsonl"
-JUDGE = RESULTS / "copilot_judge.jsonl"
 HUMAN = ROOT / "eval" / "human" / "copilot_human.csv"
 CHARS_PER_TOKEN = 3.5
 # Saída prevista por chamada (inclui tokens de raciocínio do modelo, como visto na Fase 4).
@@ -52,7 +61,14 @@ def main() -> None:
     parser.add_argument("--allow-llm", action="store_true", help="autoriza chamadas reais")
     parser.add_argument("--estimate", action="store_true", help="só mostra a estimativa")
     parser.add_argument("--rpm", type=float, default=12)
+    parser.add_argument("--version", default=PROMPT_VERSION, help="versão do copiloto avaliada")
     args = parser.parse_args()
+    paths = result_paths(RESULTS, args.version)
+    DRAFTS, JUDGE = paths["drafts"], paths["judge"]  # noqa: N806
+    if args.stage == "drafts" and args.version != PROMPT_VERSION:
+        raise SystemExit(
+            f"O código atual gera {PROMPT_VERSION}; não dá para refazer {args.version}."
+        )
 
     cases = load_cases(CASES)
     chunks = load_policies(ROOT / "policies")
@@ -102,11 +118,12 @@ def main() -> None:
     if not drafts:
         print("Sem rascunhos ainda. Rode a etapa drafts.")
         return
-    summary = summarize(cases, drafts, read_jsonl(JUDGE), load_human(HUMAN), price)
-    (RESULTS / "copilot_eval.json").write_text(
+    human = load_human(HUMAN) if args.version == HUMAN_DRAFT_VERSION else {}
+    summary = summarize(cases, drafts, read_jsonl(JUDGE), human, price)
+    paths["summary"].write_text(
         json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
     )
-    md = ROOT / "docs" / "model-cards" / "copiloto-avaliacao.md"
+    md = ROOT / "docs" / "model-cards" / f"copiloto-avaliacao-{args.version}.md"
     md.write_text(render(summary), encoding="utf-8")
     checks = summary["checks"]
     print(
