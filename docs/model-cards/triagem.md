@@ -1,6 +1,6 @@
 # Model card: triagem de reclamações
 
-**Resumo:** a triagem lê o texto de uma reclamação e escolhe uma das categorias da taxonomia (ADR 0007). Em produção, um LLM classifica sem treino (zero-shot, prompt `triage-zs-v2`). Se ele falhar, um modelo local de embeddings com regressão logística assume. No teste com 200 reclamações rotuladas à mão, o zero-shot teve F1 macro de 0,738 e acurácia de 83,5%, contra 0,639 e 71,5% do modelo local. Com o limiar de confiança fixado na validação, 75% dos tickets são classificados automaticamente, com 92,0% de acerto. Os outros 25% vão para revisão humana.
+**Resumo:** a triagem lê o texto de uma reclamação e escolhe uma das categorias da taxonomia (ADR 0007). Em produção, um LLM classifica sem treino (zero-shot, prompt `triage-zs-v2`). Se ele falhar, um modelo local de embeddings com regressão logística assume. No teste com 200 reclamações do conjunto ouro (rótulos de referência decididos pelo Eduardo **com apoio de outra IA**, ADR 0013), o zero-shot teve F1 macro de 0,738 e acurácia de 83,5%, contra 0,639 e 71,5% do modelo local. Com o limiar de confiança fixado na validação, 75% dos tickets são classificados automaticamente, com 92,0% de acerto. Os outros 25% vão para revisão humana.
 
 Todos os números vêm de `scripts/evaluate_triage.py`. As tabelas completas estão em [`triagem-resultados.md`](triagem-resultados.md) (teste) e [`triagem-validacao.md`](triagem-validacao.md) (validação). Os números brutos estão em `eval/results/triage_comparison_test.json`. O protocolo e a decisão estão no ADR 0009.
 
@@ -26,7 +26,7 @@ Depois do modelo, duas regras em código completam a triagem:
 
 ## Dados de avaliação
 
-- **Conjunto ouro:** 300 reclamações rotuladas pelo Eduardo (rodada 1), sorteadas de forma estratificada de `fct_complaints`. São 100 de validação e 200 de teste.
+- **Conjunto ouro:** 300 reclamações rotuladas pelo Eduardo com apoio de outra IA (rodada 1, ADR 0013), sorteadas de forma estratificada de `fct_complaints`. São 100 de validação e 200 de teste.
 - **Uso de cada parte:** a validação serviu para corrigir o prompt e escolher limiares. O teste rodou **uma única vez**, depois da decisão de produção.
 - **Categorias na métrica:** 8. `atraso_entrega` e `nao_recebido` contam juntas como `problema_entrega` (ADR 0007, emenda 2), porque, pelo texto, nem o rotulador humano as separa de forma consistente.
 
@@ -67,6 +67,8 @@ Depois do modelo, duas regras em código completam a triagem:
 Na validação (100 itens), o zero-shot teve acurácia de 78,0%, e o embeddings, 67,0%. No teste, os dois foram melhores: 83,5% e 71,5%. A ordem entre as abordagens se manteve. Com 100 itens, a validação tem bastante variação: 1 ticket vale 1 ponto percentual. Por isso, o número publicado é o do teste.
 
 ## Limitações
+
+- **Ouro com apoio de IA (ADR 0013):** os números medem a concordância com rótulos decididos com ajuda de outra IA, não com um rotulador humano independente. Se essa IA for parecida com o LLM da triagem, a vantagem do zero-shot pode estar inflada.
 
 - **Atraso × não recebido:** a separação final entre os dois depende do status do pedido e não foi medida no ouro, porque os rótulos humanos dessa fronteira não são consistentes. Sem número de pedido, vale a categoria do texto.
 - **Categorias raras:** `atendimento_vendedor` (6 casos) e `outro` (7) têm F1 baixo e intervalo muito largo. O zero-shot confunde atendimento com cancelamento (3 de 6). `atendimento_vendedor` só vale quando o atendimento é o único problema, então ela tende a ser rara.

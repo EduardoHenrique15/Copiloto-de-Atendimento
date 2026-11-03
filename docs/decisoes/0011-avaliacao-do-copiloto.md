@@ -63,3 +63,11 @@ A leitura dos rascunhos do `draft-v1` e das observações da avaliação humana 
    - `investigar` entrou na lista de ações, permitida pelas políticas de pedido não recebido e de atraso.
 
 **Versões e arquivos.** Cada versão tem os seus arquivos (`copilot_*_<versão>`), para comparar antes e depois. A avaliação humana vale para o `draft-v1`. Por isso, o juiz é validado no `draft-v1` (`--version draft-v1`) e, se for aceito, mede também o `draft-v2`. Rodar o `draft-v2` exige nova autorização: 60 chamadas para os rascunhos e 60 para o juiz.
+
+## Resultado do juiz no draft-v1 (2026-11-03)
+
+- Juiz `judge-v1` nos 60 rascunhos: 78,3% aprovados nos 5 critérios. Houve 3 erros 503 temporários do provedor, e o cliente repetiu as chamadas.
+- Concordância com a avaliação dos 40 rascunhos: 82,5%, com **kappa de 0,15**. A regra pedia kappa de pelo menos 0,40, então **o juiz não foi aceito**.
+- O juiz aprova quase tudo: 92,5% em ação, contra 65,0% na avaliação. Por critério, o kappa ficou entre 0,00 e 0,13, exceto em tom, que deu 1,00.
+- **A avaliação dos 40 rascunhos foi feita com apoio de outra IA (ADR 0013).** Então essa concordância não é juiz contra humano. De qualquer forma, os números do juiz **não** são usados como medida de qualidade. A qualidade do copiloto é descrita pelas verificações automáticas.
+- O juiz não vai ser rodado no `draft-v2`, porque não foi validado.

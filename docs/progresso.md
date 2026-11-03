@@ -104,7 +104,7 @@ Uma segunda execução terminou sem o `KeyboardInterrupt` da primeira (que veio 
 - **Conjunto prata gerado** (autorizado pelo Eduardo, depois de estimativa e piloto): 4.000 reclamações, prompt `weak-v2`, 0 lotes inválidos, custo real R$ 0. Distribuição: errado ou incompleto 946, não recebido 707, defeito ou qualidade 592, atraso 555, diferente do anúncio 338, sem problema 302, cancelamento ou cobrança 251, outro 235, atendimento 74. Detalhes no ADR 0008 e em `eval/results/weak_label_run.json`.
 
 **Fechamento**
-- Ouro: 300 rótulos humanos da rodada 1 (100 de validação e 200 de teste), todos com categoria válida. Distribuição: errado ou incompleto 71, defeito ou qualidade 52, atraso 51, não recebido 46, cancelamento ou cobrança 22, diferente do anúncio 20, sem problema 19, outro 11, atendimento 8. 30,7% marcados com mais de um problema.
+- Ouro: 300 rótulos da rodada 1, decididos pelo Eduardo com apoio de outra IA (ADR 0013) (100 de validação e 200 de teste), todos com categoria válida. Distribuição: errado ou incompleto 71, defeito ou qualidade 52, atraso 51, não recebido 46, cancelamento ou cobrança 22, diferente do anúncio 20, sem problema 19, outro 11, atendimento 8. 30,7% marcados com mais de um problema.
 - O prata foi comparado com o ouro na Fase 5 (ADR 0009).
 - **A rodada 2 (50 repetidos) não foi feita, por decisão do Eduardo.** O kappa do rotulador consigo mesmo **não foi medido**. É um critério da especificação que fica em aberto e entra como limitação. A melhor evidência disponível sobre consistência é indireta: na Fase 5, textos quase iguais receberam rótulos diferentes na fronteira entre atraso e não recebido (ADR 0007, emenda 2). `scripts/labeler_agreement.py` continua pronto, caso a rodada 2 seja feita no futuro.
 
@@ -233,4 +233,5 @@ Revisão de todo o repositório: código, testes, números publicados, documenta
 **Em aberto**
 - README ainda da Fase 1 (vai ser refeito na Fase 9).
 - 47 dos 60 rascunhos do `draft-v1` foram marcados para revisão humana, em geral porque o próprio LLM pede. Isso será medido de novo no `draft-v2`.
-- Juiz: validar no `draft-v1` e, se for aceito, rodar no `draft-v2` (com autorização).
+- Juiz rodado no `draft-v1` (2026-11-03): kappa de 0,15, **não aceito** (ADR 0011). Avaliação e ouro feitos com apoio de outra IA (ADR 0013).
+- `draft-v2`: gerar os 60 rascunhos (autorizado) e comparar com o `draft-v1` pelas verificações automáticas.
