@@ -35,6 +35,8 @@ class TriageResponse(Strict):
     confidence: float = Field(ge=0, le=1)
     needs_human_review: bool
     model: str
+    # Texto com dados pessoais já mascarados, para o atendente ver no canal da equipe.
+    text_masked: str
 
 
 class DraftRequest(Strict):
@@ -99,6 +101,11 @@ class MetricsResponse(Strict):
     feedback: int
     approval_without_edit_rate: float | None
     tickets_by_category: dict[str, int]
+
+
+class ReportResponse(Strict):
+    period: Literal["day", "week"]
+    text: str
 
 
 class HealthResponse(Strict):

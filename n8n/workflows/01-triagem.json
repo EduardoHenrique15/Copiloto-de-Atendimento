@@ -1,0 +1,342 @@
+{
+  "name": "01 - Triagem",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Fluxo 1: triagem\nRecebe a reclamação (webhook `triagem`), chama `POST /triage`, cria um card na lista certa do Trello, avisa no Telegram se a urgência for alta e manda os tickets que podem ter resposta automática para o fluxo 2.\n\nCredenciais: Copiloto API, Trello Copiloto, Telegram Copiloto.",
+        "height": 300,
+        "width": 420
+      },
+      "id": "b2600b1d-df6a-5baf-8b98-e3a5b40cdfd5",
+      "name": "Sobre este fluxo",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -520,
+        -220
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "triagem",
+        "options": {}
+      },
+      "id": "f3073f2e-bfb8-5663-b8d8-6c294ed5f23f",
+      "name": "Recebe reclamação",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "0d6c7267-204e-569f-b64e-53a950cdd9a9"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.COPILOTO_API_URL }}/triage",
+        "options": {},
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ ticket_id: $json.body.ticket_id, text: $json.body.text, order_id: $json.body.order_id ?? null }) }}"
+      },
+      "id": "c8500e83-8255-5709-8b73-c8983a91367a",
+      "name": "API: triagem",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        0
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "copilotoApi01",
+          "name": "Copiloto API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://api.trello.com/1/boards/{{ $env.TRELLO_BOARD_ID }}/lists",
+        "options": {},
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "trelloApi"
+      },
+      "id": "d91803c1-9565-5d77-8ba6-08978e7d57a2",
+      "name": "Trello: listas do quadro",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        0
+      ],
+      "credentials": {
+        "trelloApi": {
+          "id": "copilotoTrello01",
+          "name": "Trello Copiloto"
+        }
+      },
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Fila (lista do Trello) de cada ticket. Os nomes das listas precisam existir no quadro.\nconst t = $('API: triagem').first().json;\nconst lists = $input.all().map(i => i.json);\nconst QUEUES = {\n  atraso_entrega: 'Entrega', nao_recebido: 'Entrega',\n  produto_errado_ou_incompleto: 'Produto', produto_defeituoso_ou_qualidade: 'Produto',\n  diferente_do_anuncio: 'Produto', cancelamento_ou_cobranca: 'Financeiro',\n  atendimento_vendedor: 'Atendimento e outros', outro: 'Atendimento e outros',\n  sem_problema: 'Sem ação',\n};\nlet queue = QUEUES[t.category] ?? 'Atendimento e outros';\nif (t.urgency === 'alta') queue = 'Urgente';\nif (t.needs_human_review) queue = 'Revisar classificação';\nconst list = lists.find(l => l.name === queue);\nif (!list) {\n  throw new Error(`Crie a lista \"${queue}\" no quadro do Trello (veja n8n/README.md).`);\n}\nconst pct = Math.round(t.confidence * 100);\n// O aviso do Telegram usa HTML: o texto do cliente precisa ser escapado.\nconst esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');\nreturn [{ json: {\n  ...t,\n  queue,\n  listId: list.id,\n  cardName: `[${t.urgency}] ${t.category} · ${t.ticket_id}`,\n  cardDesc: `${t.text_masked}\\n\\nConfiança: ${pct}% · Modelo: ${t.model}` +\n            (t.needs_human_review ? '\\nRevisar a classificação antes de responder.' : ''),\n  textHtml: esc(t.text_masked),\n  urgent: t.urgency === 'alta',\n  toApproval: !t.needs_human_review && t.urgency !== 'alta' && t.category !== 'sem_problema',\n}}];"
+      },
+      "id": "609b1bc0-aee3-562f-a43e-480a7ee564cf",
+      "name": "Escolhe a fila",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.trello.com/1/cards",
+        "options": {},
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "trelloApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "idList",
+              "value": "={{ $json.listId }}"
+            },
+            {
+              "name": "name",
+              "value": "={{ $json.cardName }}"
+            },
+            {
+              "name": "desc",
+              "value": "={{ $json.cardDesc }}"
+            },
+            {
+              "name": "pos",
+              "value": "top"
+            }
+          ]
+        }
+      },
+      "id": "dd29c4ef-d34d-5b44-b293-0ffb8fb05a5a",
+      "name": "Trello: cria card",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        880,
+        0
+      ],
+      "credentials": {
+        "trelloApi": {
+          "id": "copilotoTrello01",
+          "name": "Trello Copiloto"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "82449a56-57d0-54ba-9484-3bc573786c38",
+              "leftValue": "={{ $json.urgent }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "81a0cb9b-3a36-5731-83c6-1a1f0f34dc0e",
+      "name": "Urgente?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1100,
+        -120
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $env.TELEGRAM_CHAT_ID }}",
+        "text": "=🚨 <b>Ticket urgente</b> ({{ $json.category }})\n{{ $json.textHtml }}\n\nCard criado na fila <b>{{ $json.queue }}</b>.",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "50e8d239-f1a9-5106-9d44-5c00cf664ea7",
+      "name": "Telegram: aviso urgente",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1320,
+        -140
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "copilotoTelegram01",
+          "name": "Telegram Copiloto"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c1396e3b-6871-55a4-82cb-1abba83e7d7e",
+              "leftValue": "={{ $json.toApproval }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "928fd372-2b83-59ec-94d0-aca2a0fce249",
+      "name": "Vai para aprovação?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1100,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:5678/webhook/aprovacao",
+        "options": {},
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ ticket_id: $json.ticket_id, category: $json.category, urgency: $json.urgency, text_masked: $json.text_masked }) }}"
+      },
+      "id": "ff855d33-1da5-5f07-9acc-3a0d31ab2e7f",
+      "name": "Aciona fluxo de aprovação",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1320,
+        100
+      ]
+    }
+  ],
+  "connections": {
+    "Recebe reclamação": {
+      "main": [
+        [
+          {
+            "node": "API: triagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API: triagem": {
+      "main": [
+        [
+          {
+            "node": "Trello: listas do quadro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trello: listas do quadro": {
+      "main": [
+        [
+          {
+            "node": "Escolhe a fila",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Escolhe a fila": {
+      "main": [
+        [
+          {
+            "node": "Trello: cria card",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Urgente?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Vai para aprovação?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Urgente?": {
+      "main": [
+        [
+          {
+            "node": "Telegram: aviso urgente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vai para aprovação?": {
+      "main": [
+        [
+          {
+            "node": "Aciona fluxo de aprovação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Recife"
+  },
+  "id": "CopilotoTriagem1",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "pinData": {},
+  "tags": []
+}

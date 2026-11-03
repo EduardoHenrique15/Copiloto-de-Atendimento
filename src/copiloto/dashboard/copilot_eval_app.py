@@ -18,6 +18,7 @@ from copiloto.ai.copilot.policies import load_policies
 from copiloto.ai.eval.cases import load_cases, select_for_human
 from copiloto.ai.eval.judge import CRITERIA
 from copiloto.ai.eval.run import HUMAN_COLUMNS, read_jsonl
+from copiloto.dashboard import theme
 
 ROOT = Path(__file__).resolve().parents[3]
 # A variável EVAL_DIR existe só para os testes apontarem para uma pasta temporária.
@@ -35,8 +36,11 @@ def load_done() -> pd.DataFrame:
 
 
 def main() -> None:
-    st.set_page_config(page_title="Avaliação do copiloto", layout="centered")
-    st.title("Avaliação dos rascunhos do copiloto")
+    theme.apply("Copiloto · Avaliação")
+    theme.header(
+        "Avaliação dos rascunhos",
+        "Mesma rubrica do juiz, sem ver o juiz: aprovado ou reprovado em cada critério.",
+    )
 
     if not DRAFTS.exists():
         st.error(
@@ -61,15 +65,16 @@ def main() -> None:
     case_id = pending[0]
     case, draft = cases[case_id], drafts[case_id]
     st.subheader(f"Caso {case_id}")
-    st.markdown("**Reclamação do cliente**")
-    st.info(case.complaint)
-    st.markdown("**Dados do pedido**")
+    theme.section("Reclamação do cliente")
+    theme.quote(case.complaint)
     st.code(json.dumps(case.order, ensure_ascii=False), language="json")
-    st.markdown("**Rascunho**")
-    st.success(draft["response"])
-    st.markdown(
-        f"Ação sugerida: **{draft['suggested_action']}** · "
-        f"Precisa de humano: **{'sim' if draft['needs_human'] else 'não'}**"
+    theme.section("Rascunho")
+    theme.quote(draft["response"])
+    theme.pills(
+        [
+            f"ação: {draft['suggested_action']}",
+            f"precisa de humano: {'sim' if draft['needs_human'] else 'não'}",
+        ]
     )
     with st.expander("Políticas que o redator recebeu (as citadas estão marcadas)"):
         for pid in draft["retrieved"]:
@@ -77,7 +82,7 @@ def main() -> None:
                 mark = "✅ citada" if pid in draft["policies_cited"] else "não citada"
                 st.markdown(f"**{pid}** ({mark})\n\n{chunks[pid].text}")
 
-    st.markdown("**Rubrica**")
+    theme.section("Rubrica")
     with st.form(key=f"form-{case_id}"):
         answers = {}
         for key, text in CRITERIA.items():

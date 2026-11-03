@@ -56,6 +56,7 @@ def test_triage_contract_and_idempotency(ctx):
         "confidence",
         "needs_human_review",
         "model",
+        "text_masked",
     }
     assert data["category"] == "nao_recebido"
     assert data["urgency"] == "alta"  # não recebido com status entregue
@@ -74,7 +75,10 @@ def test_low_confidence_goes_to_human_review(ctx):
 
 def test_triage_masks_pii_before_storing(ctx):
     client, deps = ctx
-    client.post("/triage", json={"ticket_id": "t-pii", "text": "meu cpf 123.456.789-09"}, headers=H)
+    r = client.post(
+        "/triage", json={"ticket_id": "t-pii", "text": "meu cpf 123.456.789-09"}, headers=H
+    )
+    assert r.json()["text_masked"] == "meu cpf [CPF]"
     from copiloto.db.models import Ticket
 
     with deps["engine"].connect() as con:
@@ -186,6 +190,17 @@ def test_metrics_contract(ctx):
     assert 0 <= data["approval_without_edit_rate"] <= 1
     assert sum(data["tickets_by_category"].values()) >= 4
     assert client.get("/metrics?period=year", headers=H).status_code == 422
+
+
+def test_metrics_report_is_text_from_the_api(ctx):
+    client, _ = ctx
+    r = client.get("/metrics/report", headers=H)
+    assert r.status_code == 200
+    data = r.json()
+    assert data["period"] == "week"
+    assert data["text"].startswith("Relatório da semana")
+    assert "Rascunhos:" in data["text"]
+    assert client.get("/metrics/report").status_code == 401
 
 
 def test_correlation_id_is_echoed(ctx):

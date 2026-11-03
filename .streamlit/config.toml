@@ -1,0 +1,14 @@
+# Tema visual das ferramentas Streamlit (Fase 8, redesenho). O CSS fino está em
+# src/copiloto/dashboard/theme.py.
+[theme]
+base = "light"
+primaryColor = "#0F766E"
+backgroundColor = "#F6F4EF"
+secondaryBackgroundColor = "#ECE8DF"
+textColor = "#1C2433"
+
+[client]
+toolbarMode = "minimal"
+
+[browser]
+gatherUsageStats = false

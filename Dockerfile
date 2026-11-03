@@ -12,6 +12,7 @@ COPY pyproject.toml README.md alembic.ini ./
 COPY src ./src
 COPY migrations ./migrations
 COPY policies ./policies
+COPY .streamlit ./.streamlit
 RUN pip install --no-deps -e .
 
 EXPOSE 8000

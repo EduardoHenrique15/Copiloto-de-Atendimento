@@ -1,0 +1,294 @@
+{
+  "name": "02 - Aprovação humana",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Fluxo 2: aprovação humana\nGera o rascunho (`POST /draft`), envia ao Telegram com um botão que abre o formulário de decisão (Aprovar, Editar ou Recusar), registra a decisão (`POST /feedback`) e, se aprovado ou editado, manda o e-mail **só para TEST_EMAIL_TO**.\n\nO formulário abre em localhost:5678, então a decisão é tomada no PC onde o n8n roda.\n\nCredenciais: Copiloto API, Telegram Copiloto, E-mail de teste.",
+        "height": 300,
+        "width": 420
+      },
+      "id": "523ada6d-12c3-5ecd-9831-b714fa5bbe2b",
+      "name": "Sobre este fluxo",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -520,
+        -220
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "aprovacao",
+        "options": {}
+      },
+      "id": "7b08ded9-1007-51d4-8418-3cff6b0ee330",
+      "name": "Recebe ticket triado",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "c021a0eb-263f-53af-bef2-a029cbbf291e"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.COPILOTO_API_URL }}/draft",
+        "options": {},
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ ticket_id: $json.body.ticket_id }) }}"
+      },
+      "id": "729f0273-d3a3-52e1-8fbf-012ad6906417",
+      "name": "API: rascunho",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        0
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "copilotoApi01",
+          "name": "Copiloto API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// O envio com espera do Telegram usa Markdown: _ * ` [ precisam de escape.\nconst esc = s => String(s ?? '').replace(/([_*`\\[])/g, '\\\\$1');\nconst t = $('Recebe ticket triado').first().json.body;\nconst d = $input.first().json;\nconst flags = d.guardrail_flags.length ? `\\nAlertas dos guardrails: ${d.guardrail_flags.join(', ')}` : '';\nconst text = [\n  `📝 Rascunho para o ticket ${t.ticket_id} (${t.category})`,\n  '',\n  `Cliente: ${t.text_masked}`,\n  '',\n  'Resposta proposta:',\n  d.response,\n  '',\n  `Ação sugerida: ${d.suggested_action} · Políticas: ${d.policies_cited.join(', ') || 'nenhuma'}${flags}`,\n].join('\\n');\nreturn [{ json: { ...d, message: esc(text) } }];"
+      },
+      "id": "370d482f-c71a-5d7b-a55a-cc7915d308f4",
+      "name": "Prepara mensagem",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "={{ $env.TELEGRAM_CHAT_ID }}",
+        "message": "={{ $json.message }}",
+        "responseType": "customForm",
+        "defineForm": "json",
+        "jsonOutput": "[\n  {\n    \"fieldLabel\": \"decisao\",\n    \"fieldType\": \"dropdown\",\n    \"requiredField\": true,\n    \"fieldOptions\": {\n      \"values\": [\n        {\n          \"option\": \"Aprovar\"\n        },\n        {\n          \"option\": \"Editar\"\n        },\n        {\n          \"option\": \"Recusar\"\n        }\n      ]\n    }\n  },\n  {\n    \"fieldLabel\": \"texto_final\",\n    \"fieldType\": \"textarea\",\n    \"placeholder\": \"Preencha só se escolher Editar\"\n  }\n]",
+        "options": {
+          "messageButtonLabel": "Decidir",
+          "responseFormTitle": "Decisão sobre o rascunho",
+          "appendAttribution": false
+        }
+      },
+      "id": "62c7ae3d-65f9-5301-9497-94b78612c5bd",
+      "name": "Telegram: pede aprovação",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        660,
+        0
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "copilotoTelegram01",
+          "name": "Telegram Copiloto"
+        }
+      },
+      "webhookId": "4f4f9faf-e8c9-58c9-b5ff-f4340d85e516"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Converte a resposta do formulário no formato do POST /feedback.\nconst form = $input.first().json.data ?? $input.first().json;\nconst draft = $('API: rascunho').first().json;\nconst map = { Aprovar: 'approved', Editar: 'edited', Recusar: 'rejected' };\nconst decision = map[form.decisao];\nif (!decision) throw new Error(`Decisão desconhecida: ${form.decisao}`);\nconst edited = (form.texto_final ?? '').trim();\nif (decision === 'edited' && !edited) throw new Error('Escolheu Editar sem preencher o texto final.');\nreturn [{ json: {\n  draft_id: draft.draft_id,\n  decision,\n  final_text: decision === 'edited' ? edited : (decision === 'approved' ? draft.response : null),\n  reviewer: 'telegram',\n  send: decision !== 'rejected',\n}}];"
+      },
+      "id": "90c51b6e-d61e-53a6-853a-1c143ff8df4f",
+      "name": "Monta decisão",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.COPILOTO_API_URL }}/feedback",
+        "options": {},
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ draft_id: $json.draft_id, decision: $json.decision, final_text: $json.final_text, reviewer: $json.reviewer }) }}"
+      },
+      "id": "b4e27fec-32f6-5624-b945-a5eb5ec2d009",
+      "name": "API: registra decisão",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1100,
+        0
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "copilotoApi01",
+          "name": "Copiloto API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "07ae523b-3323-577d-8b20-5813047fdb37",
+              "leftValue": "={{ $('Monta decisão').first().json.send }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "2fc64bdc-f8b5-5ea2-900a-180c23ce46ab",
+      "name": "Envia e-mail?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1320,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{ $env.TEST_EMAIL_TO }}",
+        "toEmail": "={{ $env.TEST_EMAIL_TO }}",
+        "subject": "=Resposta ao seu atendimento (ticket {{ $('Recebe ticket triado').first().json.body.ticket_id }})",
+        "emailFormat": "text",
+        "text": "={{ $('Monta decisão').first().json.final_text }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "08cc38c1-03ad-5930-b8a6-7f7a18d332b5",
+      "name": "E-mail de teste",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1540,
+        -20
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "copilotoSmtp01",
+          "name": "E-mail de teste"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Recebe ticket triado": {
+      "main": [
+        [
+          {
+            "node": "API: rascunho",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API: rascunho": {
+      "main": [
+        [
+          {
+            "node": "Prepara mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepara mensagem": {
+      "main": [
+        [
+          {
+            "node": "Telegram: pede aprovação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram: pede aprovação": {
+      "main": [
+        [
+          {
+            "node": "Monta decisão",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Monta decisão": {
+      "main": [
+        [
+          {
+            "node": "API: registra decisão",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API: registra decisão": {
+      "main": [
+        [
+          {
+            "node": "Envia e-mail?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Envia e-mail?": {
+      "main": [
+        [
+          {
+            "node": "E-mail de teste",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Recife"
+  },
+  "id": "CopilotoAprovacao1",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "pinData": {},
+  "tags": []
+}

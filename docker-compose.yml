@@ -1,4 +1,4 @@
-# Serviços da Fase 6 (API e banco). O n8n e o painel entram na Fase 8.
+# Serviços: API e banco (Fase 6), n8n (Fase 8) e painel (Fase 8).
 services:
   db:
     image: postgres:16-alpine
@@ -34,8 +34,58 @@ services:
       db:
         condition: service_healthy
 
+  # Painel de métricas (lê o mesmo banco da API).
+  dashboard:
+    build: .
+    command: ["streamlit", "run", "src/copiloto/dashboard/metrics_app.py",
+              "--server.address=0.0.0.0", "--server.port=8501"]
+    environment:
+      DATABASE_URL: postgresql+psycopg://copiloto:copiloto@db:5432/copiloto
+      ALERT_MAX_DAILY_COST_BRL: ${ALERT_MAX_DAILY_COST_BRL:-5}
+      ALERT_MAX_P95_LATENCY_MS: ${ALERT_MAX_P95_LATENCY_MS:-5000}
+      ALERT_MAX_GUARDRAIL_RATE: ${ALERT_MAX_GUARDRAIL_RATE:-0.2}
+    volumes:
+      - ./eval/results:/app/eval/results:ro
+    healthcheck:
+      disable: true
+    ports:
+      - "8501:8501"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # Orquestração (seção 10). Só recebe as variáveis listadas aqui, nunca o .env inteiro:
+  # chaves do LLM não entram no n8n. Credenciais ficam no volume n8n_data.
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:2.45.7
+    environment:
+      GENERIC_TIMEZONE: America/Recife
+      TZ: America/Recife
+      N8N_BLOCK_ENV_ACCESS_IN_NODE: "false"
+      N8N_DIAGNOSTICS_ENABLED: "false"
+      WEBHOOK_URL: http://localhost:5678/
+      COPILOTO_API_URL: http://api:8000
+      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID:-}
+      TRELLO_BOARD_ID: ${TRELLO_BOARD_ID:-}
+      TEST_EMAIL_TO: ${TEST_EMAIL_TO:-}
+      RISK_SIM_START_DATE: ${RISK_SIM_START_DATE:-2018-06-01}
+      PROACTIVE_MAX_PER_DAY: ${PROACTIVE_MAX_PER_DAY:-20}
+      ALERT_MAX_DAILY_COST_BRL: ${ALERT_MAX_DAILY_COST_BRL:-5}
+      ALERT_MAX_P95_LATENCY_MS: ${ALERT_MAX_P95_LATENCY_MS:-5000}
+      ALERT_MAX_GUARDRAIL_RATE: ${ALERT_MAX_GUARDRAIL_RATE:-0.2}
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./n8n/workflows:/home/node/workflows:ro
+    ports:
+      - "5678:5678"
+    depends_on:
+      - api
+
 volumes:
   pg_data:
   chroma:
   llm_cache:
   hf_cache:
+  # Mesmo volume criado na Fase 0 (conta de dono do n8n já existe nele).
+  n8n_data:
+    name: n8n_data

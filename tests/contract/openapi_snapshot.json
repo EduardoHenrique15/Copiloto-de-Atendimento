@@ -286,6 +286,29 @@
     "title": "MetricsResponse",
     "type": "object"
   },
+  "ReportResponse": {
+    "additionalProperties": false,
+    "properties": {
+      "period": {
+        "enum": [
+          "day",
+          "week"
+        ],
+        "title": "Period",
+        "type": "string"
+      },
+      "text": {
+        "title": "Text",
+        "type": "string"
+      }
+    },
+    "required": [
+      "period",
+      "text"
+    ],
+    "title": "ReportResponse",
+    "type": "object"
+  },
   "RiskBatchRequest": {
     "additionalProperties": false,
     "properties": {
@@ -478,6 +501,10 @@
         "title": "Needs Human Review",
         "type": "boolean"
       },
+      "text_masked": {
+        "title": "Text Masked",
+        "type": "string"
+      },
       "ticket_id": {
         "title": "Ticket Id",
         "type": "string"
@@ -498,7 +525,8 @@
       "urgency",
       "confidence",
       "needs_human_review",
-      "model"
+      "model",
+      "text_masked"
     ],
     "title": "TriageResponse",
     "type": "object"

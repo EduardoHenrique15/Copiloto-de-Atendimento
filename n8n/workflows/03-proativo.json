@@ -1,0 +1,197 @@
+{
+  "name": "03 - Contato proativo",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Fluxo 3: contato proativo\nTodo dia às 9h, pede à API o lote de risco da data simulada (`POST /risk/batch`). A API sorteia e grava os grupos do A/B. Só o grupo `treatment` recebe e-mail, no máximo `PROACTIVE_MAX_PER_DAY`, e sempre para TEST_EMAIL_TO.\n\nCredenciais: Copiloto API, E-mail de teste.",
+        "height": 300,
+        "width": 420
+      },
+      "id": "0a9440e4-8373-57cc-bc06-1feedae615a8",
+      "name": "Sobre este fluxo",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -520,
+        -220
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "id": "a201dac2-e00f-5118-abf7-d885f144fcef",
+      "name": "Todo dia às 9h",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// A base é histórica: cada execução usa o dia seguinte ao da anterior.\n// O estado só é salvo em execuções do fluxo ativo (não nas manuais).\nconst state = $getWorkflowStaticData('global');\nconst start = $env.RISK_SIM_START_DATE || '2018-06-01';\nconst date = state.nextDate || start;\nconst next = new Date(date + 'T12:00:00Z');\nnext.setUTCDate(next.getUTCDate() + 1);\nstate.nextDate = next.toISOString().slice(0, 10);\nreturn [{ json: { date } }];"
+      },
+      "id": "aa1671fa-3e5b-5064-a040-d79dd03aa083",
+      "name": "Data simulada",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.COPILOTO_API_URL }}/risk/batch",
+        "options": {},
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ date: $json.date }) }}"
+      },
+      "id": "c9abf461-6dd2-5aeb-882d-9fc27e936bbe",
+      "name": "API: lote de risco",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        0
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "copilotoApi01",
+          "name": "Copiloto API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Só o grupo treatment recebe contato; o control não recebe nada (a API já gravou os dois).\nconst batch = $input.first().json;\nconst max = Number($env.PROACTIVE_MAX_PER_DAY || 20);\nreturn batch.orders\n  .filter(o => o.group === 'treatment')\n  .slice(0, max)\n  .map(o => ({ json: {\n    order_id: o.order_id,\n    date: batch.date,\n    probability: o.probability,\n    reasons: o.reasons.map(r => `${r.feature} (${r.direction})`).join(', '),\n  }}));"
+      },
+      "id": "f5ef7ed4-9eab-582f-ac9a-b14b08d24ee0",
+      "name": "Grupo tratamento",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{ $env.TEST_EMAIL_TO }}",
+        "toEmail": "={{ $env.TEST_EMAIL_TO }}",
+        "subject": "=Acompanhamento do seu pedido {{ $json.order_id.slice(0, 8) }}",
+        "emailFormat": "text",
+        "text": "=Olá! Seu pedido foi entregue recentemente e queremos saber se está tudo certo. Se tiver qualquer problema, responda este e-mail que o nosso time ajuda.\n\n(Teste do Copiloto · data simulada {{ $json.date }} · risco {{ Math.round($json.probability * 100) }}% · motivos: {{ $json.reasons }})",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "e7724bcf-725a-5bb9-a06b-c911ccfebf5e",
+      "name": "E-mail de acompanhamento",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        880,
+        0
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "copilotoSmtp01",
+          "name": "E-mail de teste"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "c3323f46-5a1d-5fe3-a401-9e4522aa9a6f",
+      "name": "Executar agora (teste)",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        200
+      ]
+    }
+  ],
+  "connections": {
+    "Todo dia às 9h": {
+      "main": [
+        [
+          {
+            "node": "Data simulada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Executar agora (teste)": {
+      "main": [
+        [
+          {
+            "node": "Data simulada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data simulada": {
+      "main": [
+        [
+          {
+            "node": "API: lote de risco",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API: lote de risco": {
+      "main": [
+        [
+          {
+            "node": "Grupo tratamento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Grupo tratamento": {
+      "main": [
+        [
+          {
+            "node": "E-mail de acompanhamento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Recife"
+  },
+  "id": "CopilotoProativo1",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "pinData": {},
+  "tags": []
+}

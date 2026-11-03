@@ -19,7 +19,7 @@ from copiloto.core.errors import ConfigurationError, ExternalServiceError
 from copiloto.core.logging import bind_correlation_id, clear_correlation_id, get_logger
 from copiloto.services.errors import ConflictError, NotFoundError
 from copiloto.services.feedback import record_feedback
-from copiloto.services.metrics import compute_metrics
+from copiloto.services.metrics import compute_metrics, report_text
 
 log = get_logger("api")
 ERRORS = {401: {"model": schemas.ErrorResponse}, 422: {"model": schemas.ErrorResponse}}
@@ -104,6 +104,7 @@ def create_app(container: Container) -> FastAPI:
             confidence=ticket.confidence,
             needs_human_review=ticket.needs_human_review,
             model=ticket.model,
+            text_masked=ticket.text_masked,
         )
 
     @app.post("/draft", response_model=schemas.DraftResponse, dependencies=auth, responses=ERRORS)
@@ -155,6 +156,18 @@ def create_app(container: Container) -> FastAPI:
         db: Db, period: Annotated[str, Query(pattern="^(day|week)$")] = "day"
     ) -> schemas.MetricsResponse:
         return schemas.MetricsResponse(**compute_metrics(db, period))
+
+    @app.get(
+        "/metrics/report",
+        response_model=schemas.ReportResponse,
+        dependencies=auth,
+        responses=ERRORS,
+    )
+    def metrics_report(
+        db: Db, period: Annotated[str, Query(pattern="^(day|week)$")] = "week"
+    ) -> schemas.ReportResponse:
+        """Resumo em texto dos indicadores (gerado aqui, não pelo n8n nem pelo LLM)."""
+        return schemas.ReportResponse(period=period, text=report_text(compute_metrics(db, period)))
 
     return app
 

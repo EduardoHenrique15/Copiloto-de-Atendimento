@@ -10,7 +10,7 @@
 | 5. Triagem | Concluída | 2026-11-01 |
 | 6. Copiloto, guardrails e API | Concluída | 2026-10-31 |
 | 7. Avaliação | Em andamento | |
-| 8. n8n e painel (inclui redesenho visual) | Pendente | |
+| 8. n8n e painel (inclui redesenho visual) | Em andamento (falta configurar no PC) | |
 | 9. Documentação e entrega | Pendente | |
 
 ## Fase 0: contas e ambiente (2026-10-31)
@@ -185,3 +185,26 @@ Uma segunda execução terminou sem o `KeyboardInterrupt` da primeira (que veio 
 - Avaliação humana dos 40 rascunhos, antes do juiz.
 - Rodar o juiz (60 chamadas, com autorização) e medir a concordância.
 - Resumo no README.
+
+## Fase 8: n8n, painel e redesenho (em andamento)
+
+**O que foi feito**
+- `docker-compose.yml` com o n8n 2.45.7 (volume `n8n_data` da Fase 0 reaproveitado) e o painel. O n8n recebe só as variáveis de que precisa.
+- Os 4 fluxos em `n8n/workflows/`: triagem, aprovação humana, contato proativo e monitoramento (ADR 0012).
+  - Foram testados num n8n 2.45.7 local, de ponta a ponta, com a API sobre o container de teste e dublês do Telegram, do Trello e do e-mail.
+- `scripts/simulate_tickets.py` envia reclamações reais (fora do ouro) ao webhook.
+- API:
+  - `GET /metrics/report`: relatório semanal em texto, sem LLM;
+  - `text_masked` na resposta da triagem;
+  - snapshot do contrato atualizado.
+- Painel de métricas (`src/copiloto/dashboard/metrics_app.py`): operação ao vivo, com alertas pelos limites `ALERT_*`, e a qualidade medida offline.
+- Redesenho visual (`src/copiloto/dashboard/theme.py` e `.streamlit/config.toml`):
+  - tipografia IBM Plex, paleta própria e cartões;
+  - aplicado ao painel, à ferramenta de rotulagem e à de avaliação.
+- `tests/unit/test_n8n_exports.py` confere que os JSON não têm segredos.
+- `n8n/README.md` traz o passo a passo de configuração.
+
+**Pendências (no PC do Eduardo)**
+- Credenciais no n8n, `chat_id` do Telegram, listas e código do quadro do Trello, `TEST_EMAIL_TO` e senha de app do Gmail.
+- Importar e ativar os fluxos e simular 2 reclamações (com autorização: cerca de 4 chamadas ao LLM).
+- Critério de pronto da especificação: uma reclamação percorre triagem, rascunho, aprovação e e-mail; o fluxo proativo registra grupos; o alerta dispara com o limite forçado.

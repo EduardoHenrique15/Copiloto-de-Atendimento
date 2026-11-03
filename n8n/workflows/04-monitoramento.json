@@ -1,0 +1,277 @@
+{
+  "name": "04 - Monitoramento",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Fluxo 4: monitoramento\nA cada hora lê `GET /metrics` e avisa no Telegram se o custo do dia, a latência p95 ou a taxa de bloqueio passarem dos limites `ALERT_*`. Toda segunda às 8h envia o relatório semanal, com o texto gerado pela API (`GET /metrics/report`).\n\nPara testar o alerta: defina `ALERT_MAX_P95_LATENCY_MS=1` no .env, reinicie o n8n e execute o fluxo manualmente.\n\nCredenciais: Copiloto API, Telegram Copiloto.",
+        "height": 300,
+        "width": 420
+      },
+      "id": "32a907d1-1ffa-53d8-8e4c-5ef9f94619ca",
+      "name": "Sobre este fluxo",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -520,
+        -220
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "id": "b46bb401-3789-5762-bf58-d2a22494e6dc",
+      "name": "A cada hora",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.COPILOTO_API_URL }}/metrics",
+        "options": {},
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "period",
+              "value": "day"
+            }
+          ]
+        }
+      },
+      "id": "09f0a8ee-7985-5ae0-a5d1-890b5eeabc6d",
+      "name": "API: métricas do dia",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        0
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "copilotoApi01",
+          "name": "Copiloto API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Mesma regra de copiloto.services.metrics.check_alerts.\nconst m = $input.first().json;\nconst rules = [\n  ['custo do dia (R$)', m.cost_brl, Number($env.ALERT_MAX_DAILY_COST_BRL || 5)],\n  ['latência p95 (ms)', m.latency_p95_ms, Number($env.ALERT_MAX_P95_LATENCY_MS || 5000)],\n  ['taxa de bloqueio dos guardrails', m.guardrail_block_rate, Number($env.ALERT_MAX_GUARDRAIL_RATE || 0.2)],\n];\nconst breached = rules.filter(([, value, limit]) => value !== null && value !== undefined && value > limit);\nif (!breached.length) return [];\nconst lines = breached.map(([name, value, limit]) => `• ${name}: ${Math.round(value * 1000) / 1000} (limite ${limit})`);\nreturn [{ json: { text: `⚠️ <b>Alerta do Copiloto</b>\\n${lines.join('\\n')}` } }];"
+      },
+      "id": "9166d971-7259-593b-b314-4ce096a58535",
+      "name": "Confere limites",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $env.TELEGRAM_CHAT_ID }}",
+        "text": "={{ $json.text }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "7cd9ad79-f7bf-5039-a851-c675cc01e721",
+      "name": "Telegram: alerta",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        660,
+        0
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "copilotoTelegram01",
+          "name": "Telegram Copiloto"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1
+              ],
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "id": "c845c84c-5489-5fc9-9b03-6483fa6983d5",
+      "name": "Segunda às 8h",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.COPILOTO_API_URL }}/metrics/report",
+        "options": {},
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "period",
+              "value": "week"
+            }
+          ]
+        }
+      },
+      "id": "e6d99f81-2e22-5446-ae12-fb840b634a68",
+      "name": "API: relatório semanal",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        240
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "copilotoApi01",
+          "name": "Copiloto API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $env.TELEGRAM_CHAT_ID }}",
+        "text": "=📊 {{ $json.text }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "e5f87cb7-44e5-5685-b541-f210da0c04bd",
+      "name": "Telegram: relatório",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        440,
+        240
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "copilotoTelegram01",
+          "name": "Telegram Copiloto"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "e9e42657-2027-5c3a-9055-d9a9f36eb449",
+      "name": "Executar agora (teste)",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -200
+      ]
+    }
+  ],
+  "connections": {
+    "A cada hora": {
+      "main": [
+        [
+          {
+            "node": "API: métricas do dia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Executar agora (teste)": {
+      "main": [
+        [
+          {
+            "node": "API: métricas do dia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API: métricas do dia": {
+      "main": [
+        [
+          {
+            "node": "Confere limites",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confere limites": {
+      "main": [
+        [
+          {
+            "node": "Telegram: alerta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Segunda às 8h": {
+      "main": [
+        [
+          {
+            "node": "API: relatório semanal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API: relatório semanal": {
+      "main": [
+        [
+          {
+            "node": "Telegram: relatório",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Recife"
+  },
+  "id": "CopilotoMonitor1",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "pinData": {},
+  "tags": []
+}

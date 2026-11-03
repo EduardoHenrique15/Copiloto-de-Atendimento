@@ -279,3 +279,17 @@ Pelo mesmo motivo do teste da triagem: se eu escolho a regra depois de ver o nú
 
 **Testes de regressão**
 São casos com a resposta do LLM gravada. Eles não medem qualidade: garantem que, se alguém mexer num guardrail, o comportamento antigo não quebra sem ninguém perceber. Por isso rodam no CI, sem custo.
+
+## Fase 8: n8n e painel
+
+**Por que a regra fica na API e não no n8n?**
+A API tem testes, versão e contrato. O n8n é bom para ligar serviços (webhook, Telegram, Trello, e-mail), mas uma regra escondida dentro de um nó é difícil de testar e de revisar. Por isso, o n8n só decide coisas simples, como em qual lista do Trello vai o card.
+
+**Por que as credenciais não ficam no JSON?**
+O JSON vai para o GitHub. Se um token do Telegram vazar no histórico do git, qualquer pessoa pode mandar mensagens pelo bot. Por isso, os fluxos só citam o nome da credencial, e um teste no CI procura padrões de token antes de cada commit.
+
+**Como testar um fluxo sem Telegram nem Trello de verdade?**
+Com dublês: servidores locais que fingem ser o Telegram, o Trello e o servidor de e-mail, e anotam tudo o que recebem. Assim deu para conferir o texto exato de cada mensagem, inclusive o escape de caracteres que quebrariam o Telegram, sem mandar nada para fora.
+
+**Por que o redesenho?**
+O Streamlit padrão tem cara de protótipo. Uma paleta própria, uma tipografia escolhida, números em fonte monoespaçada e cartões com hierarquia clara fazem o painel parecer um produto, o que conta no vídeo e no portfólio.

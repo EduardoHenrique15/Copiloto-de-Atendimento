@@ -17,6 +17,7 @@ from copiloto.ai.labeling.gold import GoldStore, pending
 from copiloto.ai.labeling.sampling import load_complaints
 from copiloto.ai.taxonomy import CATEGORIES
 from copiloto.core.config import get_settings
+from copiloto.dashboard import theme
 
 ROOT = Path(__file__).resolve().parents[3]
 # A variável LABELS_DIR existe só para os testes apontarem para uma pasta temporária.
@@ -35,8 +36,10 @@ def load_texts() -> dict[str, str]:
 
 
 def main() -> None:
-    st.set_page_config(page_title="Rotulagem", layout="centered")
-    st.title("Rotulagem de reclamações")
+    theme.apply("Copiloto · Rotulagem")
+    theme.header(
+        "Rotulagem de reclamações", "Uma categoria por comentário, seguindo o guia de rótulos."
+    )
 
     if not SAMPLE_PATH.exists():
         st.error("Amostra não encontrada. Rode antes: python scripts/make_gold_sample.py")
@@ -75,7 +78,7 @@ def main() -> None:
 
     cid = todo[0]
     st.caption(f"Item {cid[:8]} · faltam {len(todo)}")
-    st.markdown(f"> {texts.get(cid, '(texto não encontrado no DuckDB)')}")
+    theme.quote(texts.get(cid, "(texto não encontrado no DuckDB)"))
 
     if state.pop("reset_multi", False):
         state.multi = False
