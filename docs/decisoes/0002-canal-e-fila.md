@@ -16,3 +16,9 @@ Os fluxos do n8n precisam de um canal para avisos e aprovação humana, e de uma
 
 - Se for preciso aprovar pelo celular fora de casa, vai ser necessário um túnel (`cloudflared`), documentado na Fase 8.
 - O teste gratuito do Trello Premium expira, mas o projeto só usa recursos do plano gratuito.
+
+## Correção de 2026-11-03
+
+A premissa de que o botão do Telegram podia apontar para `localhost` estava errada. Na primeira execução real, o Telegram recusou a mensagem com "inline keyboard button URL ... is invalid: Wrong HTTP URL": ele não aceita botão com link para `localhost`. Os testes com dublês não pegaram isso, porque o dublê aceitava qualquer botão.
+
+Correção (ADR 0012): o fluxo 2 manda o rascunho como mensagem comum, com o link do formulário de decisão **no texto**, e espera a resposta num nó "Wait" do tipo formulário. Continua sem túnel: o atendente copia ou clica no link no PC onde o n8n roda.

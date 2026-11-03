@@ -3,7 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "content": "## Fluxo 2: aprovação humana\nGera o rascunho (`POST /draft`), envia ao Telegram com um botão que abre o formulário de decisão (Aprovar, Editar ou Recusar), registra a decisão (`POST /feedback`) e, se aprovado ou editado, manda o e-mail **só para TEST_EMAIL_TO**.\n\nO formulário abre em localhost:5678, então a decisão é tomada no PC onde o n8n roda.\n\nCredenciais: Copiloto API, Telegram Copiloto, E-mail de teste.",
+        "content": "## Fluxo 2: aprovação humana\nGera o rascunho (`POST /draft`), envia ao Telegram com o link do formulário de decisão (Aprovar, Editar ou Recusar). O Telegram não aceita botão com link para localhost, por isso o link vai no texto, registra a decisão (`POST /feedback`) e, se aprovado ou editado, manda o e-mail **só para TEST_EMAIL_TO**.\n\nO formulário abre em localhost:5678, então a decisão é tomada no PC onde o n8n roda.\n\nCredenciais: Copiloto API, Telegram Copiloto, E-mail de teste.",
         "height": 300,
         "width": 420
       },
@@ -60,7 +60,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// O envio com espera do Telegram usa Markdown: _ * ` [ precisam de escape.\nconst esc = s => String(s ?? '').replace(/([_*`\\[])/g, '\\\\$1');\nconst t = $('Recebe ticket triado').first().json.body;\nconst d = $input.first().json;\nconst flags = d.guardrail_flags.length ? `\\nAlertas dos guardrails: ${d.guardrail_flags.join(', ')}` : '';\nconst text = [\n  `📝 Rascunho para o ticket ${t.ticket_id} (${t.category})`,\n  '',\n  `Cliente: ${t.text_masked}`,\n  '',\n  'Resposta proposta:',\n  d.response,\n  '',\n  `Ação sugerida: ${d.suggested_action} · Políticas: ${d.policies_cited.join(', ') || 'nenhuma'}${flags}`,\n].join('\\n');\nreturn [{ json: { ...d, message: esc(text) } }];"
+        "jsCode": "// A mensagem vai em HTML: &, < e > do texto do cliente precisam de escape\n// (o padrão do nó, Markdown, quebraria com o \"_\" das categorias).\n// O Telegram não aceita botão com link para localhost, então o link do formulário\n// de decisão vai no texto. Ele é gerado pelo nó \"Aguarda decisão\" ($execution.resumeFormUrl).\nconst t = $('Recebe ticket triado').first().json.body;\nconst d = $input.first().json;\nconst flags = d.guardrail_flags.length ? `\\nAlertas dos guardrails: ${d.guardrail_flags.join(', ')}` : '';\nconst text = [\n  `📝 Rascunho para o ticket ${t.ticket_id} (${t.category})`,\n  '',\n  `Cliente: ${t.text_masked}`,\n  '',\n  'Resposta proposta:',\n  d.response,\n  '',\n  `Ação sugerida: ${d.suggested_action} · Políticas: ${d.policies_cited.join(', ') || 'nenhuma'}${flags}`,\n  '',\n  'Para decidir, abra no PC onde o n8n roda:',\n].join('\\n');\nconst esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');\nreturn [{ json: { ...d, message: esc(text) } }];"
       },
       "id": "370d482f-c71a-5d7b-a55a-cc7915d308f4",
       "name": "Prepara mensagem",
@@ -73,16 +73,12 @@
     },
     {
       "parameters": {
-        "operation": "sendAndWait",
         "chatId": "={{ $env.TELEGRAM_CHAT_ID }}",
-        "message": "={{ $json.message }}",
-        "responseType": "customForm",
-        "defineForm": "json",
-        "jsonOutput": "[\n  {\n    \"fieldLabel\": \"decisao\",\n    \"fieldType\": \"dropdown\",\n    \"requiredField\": true,\n    \"fieldOptions\": {\n      \"values\": [\n        {\n          \"option\": \"Aprovar\"\n        },\n        {\n          \"option\": \"Editar\"\n        },\n        {\n          \"option\": \"Recusar\"\n        }\n      ]\n    }\n  },\n  {\n    \"fieldLabel\": \"texto_final\",\n    \"fieldType\": \"textarea\",\n    \"placeholder\": \"Preencha só se escolher Editar\"\n  }\n]",
-        "options": {
-          "messageButtonLabel": "Decidir",
-          "responseFormTitle": "Decisão sobre o rascunho",
-          "appendAttribution": false
+        "text": "={{ $json.message }}\n{{ $execution.resumeFormUrl }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "disable_web_page_preview": true,
+          "parse_mode": "HTML"
         }
       },
       "id": "62c7ae3d-65f9-5301-9497-94b78612c5bd",
@@ -98,8 +94,50 @@
           "id": "copilotoTelegram01",
           "name": "Telegram Copiloto"
         }
+      }
+    },
+    {
+      "parameters": {
+        "resume": "form",
+        "formTitle": "Decisão sobre o rascunho",
+        "formDescription": "Aprovar envia o rascunho; Editar envia o texto final; Recusar não envia nada.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "decisao",
+              "fieldType": "dropdown",
+              "requiredField": true,
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Aprovar"
+                  },
+                  {
+                    "option": "Editar"
+                  },
+                  {
+                    "option": "Recusar"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "texto_final",
+              "fieldType": "textarea"
+            }
+          ]
+        },
+        "options": {}
       },
-      "webhookId": "4f4f9faf-e8c9-58c9-b5ff-f4340d85e516"
+      "id": "a090047d-24fd-52e9-854c-59931e14705e",
+      "name": "Aguarda decisão",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        880,
+        0
+      ],
+      "webhookId": "2ecbfd01-fc23-573c-a1d8-747713271a3d"
     },
     {
       "parameters": {
@@ -110,7 +148,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        880,
+        1100,
         0
       ]
     },
@@ -130,7 +168,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1100,
+        1320,
         0
       ],
       "credentials": {
@@ -170,7 +208,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        1320,
+        1540,
         0
       ]
     },
@@ -190,7 +228,7 @@
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
       "position": [
-        1540,
+        1760,
         -20
       ],
       "credentials": {
@@ -236,6 +274,17 @@
       ]
     },
     "Telegram: pede aprovação": {
+      "main": [
+        [
+          {
+            "node": "Aguarda decisão",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aguarda decisão": {
       "main": [
         [
           {

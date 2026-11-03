@@ -22,9 +22,10 @@ A seção 10 pede quatro fluxos no n8n, versionados em JSON e sem segredos, com 
 4. **Filas do Trello por tipo de ação, não por categoria.**
    - São 7 listas: Urgente, Entrega, Produto, Financeiro, Atendimento e outros, Sem ação e Revisar classificação.
    - A regra: revisão humana tem prioridade, depois urgência alta, depois a categoria.
-5. **Aprovação pelo "enviar e esperar" do Telegram**, com formulário: Aprovar, Editar (com o texto final) ou Recusar.
-   - O formulário abre em `localhost:5678`, então a decisão é tomada no PC do n8n, sem túnel (ADR 0002).
-   - A mensagem escapa os caracteres do Markdown do Telegram (`_`, `*`, `` ` ``, `[`), porque as categorias têm `_`.
+5. **Aprovação por link de formulário no texto da mensagem** (corrigido em 2026-11-03): Aprovar, Editar (com o texto final) ou Recusar.
+   - A primeira versão usava o "enviar e esperar" do Telegram, com botão. O Telegram recusa botão com link para `localhost` ("Wrong HTTP URL").
+   - Agora o fluxo manda uma mensagem comum, com o link do formulário (`$execution.resumeFormUrl`) no texto, e espera num nó "Wait" do tipo formulário. A decisão é tomada no PC do n8n, sem túnel (ADR 0002).
+   - A mensagem vai em HTML, com escape de `&`, `<` e `>`. O padrão do nó, Markdown, quebraria com o `_` das categorias.
 6. **Quem vai para aprovação:** ticket sem revisão humana, sem urgência alta e com problema relatado (não `sem_problema`). Ticket urgente vai para uma pessoa direto, com aviso no Telegram.
 7. **Contato proativo pelo campo `contact`:** a API aplica o limite diário aos dois grupos e marca quem deve ser contatado (veja `docs/experimento-ab.md`). O fluxo só filtra.
 8. **Data simulada no fluxo proativo:** a base é histórica. A data fica nos dados estáticos do fluxo e avança um dia por execução agendada.

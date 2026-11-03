@@ -70,6 +70,8 @@ docker compose restart n8n
 
 No n8n, abra cada um dos 4 fluxos e ative (botão **Publish** ou **Active**).
 
+**Importar de novo despublica os fluxos.** Depois de qualquer importação, publique os 4 outra vez.
+
 ## 7. Testar
 
 **Triagem e aprovação.** Cada reclamação faz 1 chamada ao LLM na triagem e mais 1 no rascunho. Por isso, este teste precisa de autorização.
@@ -80,8 +82,8 @@ python scripts/simulate_tickets.py --n 2 --interval 30
 ```
 
 1. Os cards aparecem no Trello.
-2. Os tickets que podem ter resposta automática chegam no Telegram com o botão **Decidir**.
-3. O botão abre o formulário em `localhost:5678`, então clique no PC onde o n8n roda.
+2. Os tickets que podem ter resposta automática chegam no Telegram com um **link** no fim da mensagem. O Telegram não aceita botão para `localhost`, por isso é um link.
+3. Abra o link no PC onde o n8n roda. Ele leva ao formulário de decisão em `localhost:5678`.
 4. Escolha Aprovar, Editar ou Recusar.
 5. Aprovado ou editado, o e-mail chega no `TEST_EMAIL_TO`.
 
