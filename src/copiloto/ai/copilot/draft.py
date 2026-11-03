@@ -105,7 +105,9 @@ def generate_draft(
     cited, citation_events = check_citations(output.politicas_citadas, policies)
     action, action_events = check_action(output.acao_sugerida, cited, policies)
     events += citation_events + action_events
-    events += check_promises(text, [p.text for p in policies] + _order_sources(order))
+    # O título da seção também é fonte: "Atraso de 4 dias ou mais" autoriza o "4 dias" (draft-v3).
+    sources = [f"{p.section}. {p.text}" for p in policies] + _order_sources(order)
+    events += check_promises(text, sources)
     events += check_style(text)
 
     flags = sorted({e.type for e in events})

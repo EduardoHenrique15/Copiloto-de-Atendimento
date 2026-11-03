@@ -117,3 +117,17 @@
     motivo: "Atraso curto."
   expected: {action: nenhuma, needs_human: true, flags: [forbidden_terms], fallback: false,
              cited: [atraso-na-entrega#atraso-de-ate-3-dias]}
+
+- id: r09_numero_do_titulo_da_secao
+  complaint: "Chegou 6 dias atrasado."
+  category: atraso_entrega
+  order: {order_status: delivered, delay_days: 6, items_price: 50.0}
+  retrieved: [atraso-na-entrega#atraso-de-4-dias-ou-mais]
+  llm_output:
+    resposta: "Olá! Pedimos desculpas. Como o atraso foi de 4 dias ou mais, você recebe um cupom de R$ 20."
+    politicas_citadas: [atraso-na-entrega#atraso-de-4-dias-ou-mais]
+    acao_sugerida: cupom
+    precisa_humano: false
+    motivo: "Atraso de 4 dias ou mais."
+  expected: {action: cupom, needs_human: false, flags: [], fallback: false,
+             cited: [atraso-na-entrega#atraso-de-4-dias-ou-mais]}

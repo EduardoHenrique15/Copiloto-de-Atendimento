@@ -5,7 +5,8 @@ import json
 from copiloto.ai.copilot.policies import ACTIONS, PolicyChunk
 
 # draft-v2: busca híbrida (políticas da categoria sempre entram) e ação "investigar".
-PROMPT_VERSION = "draft-v2"
+# draft-v3: o guardrail de promessas aceita números do título da seção da política.
+PROMPT_VERSION = "draft-v3"
 
 SYSTEM = f"""Você escreve rascunhos de resposta para o atendimento da Loja Exemplo, uma loja \
 online brasileira. Um atendente humano revisa cada rascunho antes do envio.

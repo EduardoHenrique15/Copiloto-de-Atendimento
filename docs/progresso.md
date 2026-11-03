@@ -234,4 +234,4 @@ Revisão de todo o repositório: código, testes, números publicados, documenta
 - README ainda da Fase 1 (vai ser refeito na Fase 9).
 - 47 dos 60 rascunhos do `draft-v1` foram marcados para revisão humana, em geral porque o próprio LLM pede. Isso será medido de novo no `draft-v2`.
 - Juiz rodado no `draft-v1` (2026-11-03): kappa de 0,15, **não aceito** (ADR 0011). Avaliação e ouro feitos com apoio de outra IA (ADR 0013).
-- `draft-v2`: gerar os 60 rascunhos (autorizado) e comparar com o `draft-v1` pelas verificações automáticas.
+- `draft-v2` medido (2026-11-03): citação de 81,7% para 98,3% e ação de 88,3% para 93,3%. Falso positivo do guardrail de promessas em 6 rascunhos, corrigido no `draft-v3` (ADR 0011).

@@ -71,3 +71,24 @@ A leitura dos rascunhos do `draft-v1` e das observações da avaliação humana 
 - O juiz aprova quase tudo: 92,5% em ação, contra 65,0% na avaliação. Por critério, o kappa ficou entre 0,00 e 0,13, exceto em tom, que deu 1,00.
 - **A avaliação dos 40 rascunhos foi feita com apoio de outra IA (ADR 0013).** Então essa concordância não é juiz contra humano. De qualquer forma, os números do juiz **não** são usados como medida de qualidade. A qualidade do copiloto é descrita pelas verificações automáticas.
 - O juiz não vai ser rodado no `draft-v2`, porque não foi validado.
+
+## Resultado do draft-v2 (2026-11-03) e correção no draft-v3
+
+60 rascunhos, verificações automáticas (relatórios em `docs/model-cards/copiloto-avaliacao-<versão>.md`):
+
+| Verificação | draft-v1 | draft-v2 |
+| --- | ---: | ---: |
+| Citação de uma política esperada | 81,7% | 98,3% |
+| Ação entre as aceitas | 88,3% | 93,3% |
+| Envio para humano como esperado (18 casos) | 83,3% | 88,9% |
+| Injection detectada pelo guardrail (10 casos) | 50,0% | 50,0% |
+| Resposta trocada pelo texto padrão | 0,0% | 10,0% |
+
+- **A busca híbrida resolveu a citação.** A ação também melhorou, com `investigar` usada em 7 rascunhos.
+- **Bug encontrado com o draft-v2:** os 6 bloqueios por promessa sem base foram falsos positivos, todos na política de atraso.
+  - O rascunho repetia a regra ("atraso de 4 dias ou mais"), e o número estava só no **título** da seção, que o guardrail não lia.
+  - No draft-v1 quase não aparecia, porque essa política raramente era recuperada.
+  - O **draft-v3** passa o título da seção ao guardrail, com o caso de regressão `r09`.
+- **Ainda alto:** 51 de 60 rascunhos vão para revisão humana (47 no draft-v1), em geral porque o próprio LLM pede.
+- **Latência do draft-v2:** p50 de 18,8 s, contra 1,4 s no draft-v1. O provedor estava instável na execução (erros 503 repetidos), e a medida inclui as novas tentativas. Não houve mudança de código que explique isso.
+- Medir o draft-v3 exige mais 60 chamadas, com autorização.
