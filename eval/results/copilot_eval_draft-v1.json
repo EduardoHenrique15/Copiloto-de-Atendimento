@@ -393,6 +393,68 @@
   },
   "cost": {
     "draft_p50_ms": 1399.6005999943009,
-    "draft_p95_ms": 2067.0783500114335
+    "draft_p95_ms": 2067.0783500114335,
+    "draft_per_1000_brl": 3.2025055866666663,
+    "judge_per_1000_brl": 3.6833650333333336
+  },
+  "judge_prompt": "judge-v1",
+  "judge": {
+    "n": 60,
+    "failures": 0,
+    "pass_rate": {
+      "fidelidade": 0.9333333333333333,
+      "acao": 0.95,
+      "citacao": 0.8666666666666667,
+      "tom": 0.9833333333333333,
+      "sem_promessa": 1.0
+    },
+    "all_pass_rate": 0.7833333333333333
+  },
+  "agreement": {
+    "n_cases": 40,
+    "per_criterion": {
+      "fidelidade": {
+        "n": 40,
+        "agreement": 0.75,
+        "kappa": 0.06103286384976514,
+        "human_pass_rate": 0.775,
+        "judge_pass_rate": 0.925
+      },
+      "acao": {
+        "n": 40,
+        "agreement": 0.675,
+        "kappa": 0.12751677852348986,
+        "human_pass_rate": 0.65,
+        "judge_pass_rate": 0.925
+      },
+      "citacao": {
+        "n": 40,
+        "agreement": 0.825,
+        "kappa": 0.125,
+        "human_pass_rate": 0.875,
+        "judge_pass_rate": 0.9
+      },
+      "tom": {
+        "n": 40,
+        "agreement": 1.0,
+        "kappa": 1.0,
+        "human_pass_rate": 0.975,
+        "judge_pass_rate": 0.975
+      },
+      "sem_promessa": {
+        "n": 40,
+        "agreement": 0.875,
+        "kappa": 0.0,
+        "human_pass_rate": 0.875,
+        "judge_pass_rate": 1.0
+      }
+    },
+    "overall_agreement": 0.825,
+    "overall_kappa": 0.15172079495879798,
+    "rule": {
+      "min_agreement": 0.8,
+      "min_kappa": 0.4
+    },
+    "acceptable": false
   }
 }
