@@ -9,7 +9,7 @@
 | 4. Taxonomia e rotulagem | Concluída, sem o kappa do rotulador | 2026-11-01 |
 | 5. Triagem | Concluída | 2026-11-01 |
 | 6. Copiloto, guardrails e API | Concluída | 2026-10-31 |
-| 7. Avaliação | Em andamento | |
+| 7. Avaliação | Concluída | 2026-11-03 |
 | 8. n8n e painel (inclui redesenho visual) | Em andamento (falta configurar no PC) | |
 | 9. Documentação e entrega | Pendente | |
 
@@ -170,7 +170,7 @@ Uma segunda execução terminou sem o `KeyboardInterrupt` da primeira (que veio 
 
 **Pendências:** nenhuma desta fase. A qualidade dos rascunhos é medida na Fase 7.
 
-## Fase 7: avaliação (em andamento)
+## Fase 7: avaliação (2026-11-03)
 
 **O que foi feito**
 - 60 casos fictícios do copiloto (`eval/copilot_cases.yaml`): 9 categorias, 7 sem política aplicável, 10 tentativas de prompt injection e 3 com dados pessoais inventados.
@@ -180,11 +180,12 @@ Uma segunda execução terminou sem o `KeyboardInterrupt` da primeira (que veio 
 - Regressão no CI: 8 casos com respostas gravadas (`eval/regression_cases.yaml`, `tests/unit/test_copilot_regression.py`).
 - ADR 0011, com a regra de aceitação do juiz definida antes dos resultados.
 
-**Pendências**
-- Rodar os rascunhos (60 chamadas, com autorização).
-- Avaliação humana dos 40 rascunhos, antes do juiz.
-- Rodar o juiz (60 chamadas, com autorização) e medir a concordância.
-- Resumo no README.
+**Resultados**
+- `draft-v3`: citação de 98,3% e ação de 98,3% nas verificações automáticas, contra 81,7% e 88,3% no `draft-v1`. Nenhum rascunho bloqueado por engano. Model card: `docs/model-cards/copiloto.md`.
+- Juiz `judge-v1`: kappa de 0,15, não aceito (ADR 0011). Avaliação dos 40 rascunhos e conjunto ouro feitos com apoio de outra IA (ADR 0013).
+- Regressão no CI: 9 casos em `eval/regression_cases.yaml`.
+
+**Pendências:** nenhuma desta fase. O resumo no README fica para a Fase 9.
 
 ## Fase 8: n8n, painel e redesenho (em andamento)
 

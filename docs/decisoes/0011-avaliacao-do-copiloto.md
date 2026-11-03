@@ -92,3 +92,9 @@ A leitura dos rascunhos do `draft-v1` e das observações da avaliação humana 
 - **Ainda alto:** 51 de 60 rascunhos vão para revisão humana (47 no draft-v1), em geral porque o próprio LLM pede.
 - **Latência do draft-v2:** p50 de 18,8 s, contra 1,4 s no draft-v1. O provedor estava instável na execução (erros 503 repetidos), e a medida inclui as novas tentativas. Não houve mudança de código que explique isso.
 - Medir o draft-v3 exige mais 60 chamadas, com autorização.
+
+## Resultado do draft-v3 (2026-11-03)
+
+- Citação de 98,3%, ação de 98,3%, envio para humano como esperado em 88,9% dos casos e injection detectada em 50%. Nenhuma resposta foi trocada pelo texto padrão.
+- As 60 respostas do LLM vieram do cache em disco do draft-v2, porque o prompt é idêntico. A comparação v2 → v3 isola o efeito da correção do guardrail. Com isso, a latência do v3 não é representativa.
+- Versão de produção: `draft-v3`. Resumo em `docs/model-cards/copiloto.md`.
