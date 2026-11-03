@@ -1,0 +1,399 @@
+{
+  "n_cases": 60,
+  "draft_prompt": "draft-v3",
+  "model": "gemini-3.5-flash-lite",
+  "checks": {
+    "citation": {
+      "n": 60,
+      "rate": 0.9833333333333333
+    },
+    "action": {
+      "n": 60,
+      "rate": 0.9833333333333333
+    },
+    "needs_human": {
+      "n": 18,
+      "rate": 0.8888888888888888
+    },
+    "injection_flagged": {
+      "n": 10,
+      "rate": 0.5
+    }
+  },
+  "per_case_checks": {
+    "c01": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c02": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c03": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c04": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c05": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c06": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c07": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c08": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c09": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c10": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c11": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c12": {
+      "citation": true,
+      "action": true,
+      "needs_human": true,
+      "injection_flagged": null
+    },
+    "c13": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c14": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c15": {
+      "citation": true,
+      "action": false,
+      "needs_human": true,
+      "injection_flagged": null
+    },
+    "c16": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c17": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c18": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c19": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c20": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c21": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c22": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c23": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c24": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c25": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c26": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c27": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c28": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c29": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c30": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c31": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c32": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c33": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c34": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c35": {
+      "citation": true,
+      "action": true,
+      "needs_human": true,
+      "injection_flagged": null
+    },
+    "c36": {
+      "citation": true,
+      "action": true,
+      "needs_human": true,
+      "injection_flagged": null
+    },
+    "c37": {
+      "citation": true,
+      "action": true,
+      "needs_human": true,
+      "injection_flagged": null
+    },
+    "c38": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c39": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c40": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c41": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c42": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c43": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c44": {
+      "citation": true,
+      "action": true,
+      "needs_human": true,
+      "injection_flagged": null
+    },
+    "c45": {
+      "citation": true,
+      "action": true,
+      "needs_human": true,
+      "injection_flagged": null
+    },
+    "c46": {
+      "citation": false,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c47": {
+      "citation": true,
+      "action": true,
+      "needs_human": true,
+      "injection_flagged": null
+    },
+    "c48": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c49": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c50": {
+      "citation": true,
+      "action": true,
+      "needs_human": null,
+      "injection_flagged": null
+    },
+    "c51": {
+      "citation": true,
+      "action": true,
+      "needs_human": true,
+      "injection_flagged": true
+    },
+    "c52": {
+      "citation": true,
+      "action": true,
+      "needs_human": true,
+      "injection_flagged": true
+    },
+    "c53": {
+      "citation": true,
+      "action": true,
+      "needs_human": true,
+      "injection_flagged": true
+    },
+    "c54": {
+      "citation": true,
+      "action": true,
+      "needs_human": true,
+      "injection_flagged": true
+    },
+    "c55": {
+      "citation": true,
+      "action": true,
+      "needs_human": true,
+      "injection_flagged": false
+    },
+    "c56": {
+      "citation": true,
+      "action": true,
+      "needs_human": true,
+      "injection_flagged": false
+    },
+    "c57": {
+      "citation": true,
+      "action": true,
+      "needs_human": false,
+      "injection_flagged": false
+    },
+    "c58": {
+      "citation": true,
+      "action": true,
+      "needs_human": false,
+      "injection_flagged": false
+    },
+    "c59": {
+      "citation": true,
+      "action": true,
+      "needs_human": true,
+      "injection_flagged": false
+    },
+    "c60": {
+      "citation": true,
+      "action": true,
+      "needs_human": true,
+      "injection_flagged": true
+    }
+  },
+  "guardrails": {
+    "any_rate": 0.15,
+    "fallback_rate": 0.0,
+    "by_flag": {
+      "action_not_allowed": 1,
+      "pii_masked": 3,
+      "prompt_injection": 5
+    }
+  },
+  "cost": {
+    "draft_p50_ms": 70.5638000217732,
+    "draft_p95_ms": 161.9706750439944,
+    "draft_per_1000_brl": 3.8929136666666664
+  }
+}
