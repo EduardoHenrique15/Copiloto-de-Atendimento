@@ -11,7 +11,7 @@
 | 6. Copiloto, guardrails e API | Concluída | 2026-10-31 |
 | 7. Avaliação | Concluída | 2026-11-03 |
 | 8. n8n e painel (inclui redesenho visual) | Concluída | 2026-11-04 |
-| 9. Documentação e entrega | Em andamento (falta o vídeo) | |
+| 9. Documentação e entrega | Concluída | 2026-11-04 |
 
 ## Fase 0: contas e ambiente (2026-10-31)
 
@@ -247,13 +247,24 @@ Revisão de todo o repositório: código, testes, números publicados, documenta
 - Juiz rodado no `draft-v1` (2026-11-03): kappa de 0,15, **não aceito** (ADR 0011). Avaliação e ouro feitos com apoio de outra IA (ADR 0013).
 - `draft-v2` medido (2026-11-03): citação de 81,7% para 98,3% e ação de 88,3% para 93,3%. Falso positivo do guardrail de promessas em 6 rascunhos, corrigido no `draft-v3` (ADR 0011).
 
-## Fase 9: documentação e entrega (em andamento)
+## Fase 9: documentação e entrega (2026-11-04)
 
 **O que foi feito**
 - README completo: problema, resultados com números reais, arquitetura em Mermaid e PNG (`docs/arquitetura.png`), decisões, como rodar do zero, qualidade e documentação.
 - `docs/design-doc.md`, `docs/limitacoes.md`, `docs/seguranca.md` e `docs/roteiro-video.md` (com o rascunho do post).
 - `docs/relatorio-impacto.md`, gerado por `scripts/impact_report.py` só a partir de `eval/results/`.
 
-**Pendências**
-- Gravar o vídeo (Eduardo), seguindo `docs/roteiro-video.md`.
-- Checklist final da seção 14 da especificação.
+**Vídeo**
+- Vídeo de 2 min 20 s, sem narração e com legendas, montado só com material real do projeto: diagrama, gráficos, resultados dos scripts e prints do teste no PC (Trello, Telegram, Gmail e n8n). O arquivo fica fora do git, por causa do tamanho.
+
+**Checklist final (seção 14), conferido em 2026-11-04 sobre o commit `0dfa13f`**
+- [x] Clone novo: `ruff` limpo e 248 testes passando, sem gerar arquivos.
+- [x] `docker compose up` sobe API, banco, n8n e painel (testado no PC do Eduardo).
+- [x] `pytest` passa e o CI está verde (execução 30).
+- [x] Nenhum segredo em todo o histórico do git (busca por `AIza`, `sk-`, `gsk_`, `xox`, token de bot): 0 ocorrências.
+- [x] Nenhum JSON do n8n com credenciais (`tests/unit/test_n8n_exports.py`).
+- [x] Dados brutos fora do repositório em todo o histórico, com a fonte e a licença no README.
+- [x] Os 14 números da tabela do README conferidos contra os JSON de `eval/results/`.
+- [x] Todas as políticas com o aviso "Política fictícia criada para este projeto".
+- [x] Design doc, model cards, relatório de impacto, ADRs, limitações e segurança no repositório; links do README sem quebra.
+- [ ] O Eduardo leu `docs/aprendizado.md` e consegue explicar cada decisão (com ele).
