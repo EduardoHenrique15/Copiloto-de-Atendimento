@@ -10,8 +10,8 @@
 | 5. Triagem | Concluída | 2026-11-01 |
 | 6. Copiloto, guardrails e API | Concluída | 2026-10-31 |
 | 7. Avaliação | Concluída | 2026-11-03 |
-| 8. n8n e painel (inclui redesenho visual) | Em andamento (falta configurar no PC) | |
-| 9. Documentação e entrega | Pendente | |
+| 8. n8n e painel (inclui redesenho visual) | Concluída | 2026-11-04 |
+| 9. Documentação e entrega | Em andamento (falta o vídeo) | |
 
 ## Fase 0: contas e ambiente (2026-10-31)
 
@@ -187,7 +187,7 @@ Uma segunda execução terminou sem o `KeyboardInterrupt` da primeira (que veio 
 
 **Pendências:** nenhuma desta fase. O resumo no README fica para a Fase 9.
 
-## Fase 8: n8n, painel e redesenho (em andamento)
+## Fase 8: n8n, painel e redesenho (2026-11-04)
 
 **O que foi feito**
 - `docker-compose.yml` com o n8n 2.45.7 (volume `n8n_data` da Fase 0 reaproveitado) e o painel. O n8n recebe só as variáveis de que precisa.
@@ -209,6 +209,16 @@ Uma segunda execução terminou sem o `KeyboardInterrupt` da primeira (que veio 
 - Credenciais no n8n, `chat_id` do Telegram, listas e código do quadro do Trello, `TEST_EMAIL_TO` e senha de app do Gmail.
 - Importar e ativar os fluxos e simular 2 reclamações (com autorização: cerca de 4 chamadas ao LLM).
 - Critério de pronto da especificação: uma reclamação percorre triagem, rascunho, aprovação e e-mail; o fluxo proativo registra grupos; o alerta dispara com o limite forçado.
+
+**Configuração e teste no PC do Eduardo (2026-11-03 e 2026-11-04)**
+- Docker Compose com API, PostgreSQL, n8n e painel. Correção: `libgomp1` na imagem, porque o LightGBM não carregava.
+- Credenciais no n8n: Copiloto API, Telegram, Trello e Gmail (senha de app). Listas do Trello criadas e `chat_id` configurado.
+- Critérios da especificação, todos verificados:
+  - **Triagem:** a reclamação simulada vira card na fila certa, com aviso urgente no Telegram.
+  - **Aprovação:** o rascunho chega no Telegram, a decisão é registrada e o e-mail chega no Gmail.
+  - **Proativo:** a API registrou os grupos, e 10 pedidos do tratamento receberam e-mail.
+  - **Alerta:** forçado com `ALERT_MAX_P95_LATENCY_MS=1`, ele chegou no Telegram.
+- Correção no fluxo 2: o Telegram recusa botão com link para `localhost`. A aprovação passou a ser por link no texto da mensagem, com um nó Wait de formulário e mensagem em HTML (ADRs 0002 e 0012).
 
 ## Revisão completa (2026-11-01)
 
@@ -236,3 +246,14 @@ Revisão de todo o repositório: código, testes, números publicados, documenta
 - 47 dos 60 rascunhos do `draft-v1` foram marcados para revisão humana, em geral porque o próprio LLM pede. Isso será medido de novo no `draft-v2`.
 - Juiz rodado no `draft-v1` (2026-11-03): kappa de 0,15, **não aceito** (ADR 0011). Avaliação e ouro feitos com apoio de outra IA (ADR 0013).
 - `draft-v2` medido (2026-11-03): citação de 81,7% para 98,3% e ação de 88,3% para 93,3%. Falso positivo do guardrail de promessas em 6 rascunhos, corrigido no `draft-v3` (ADR 0011).
+
+## Fase 9: documentação e entrega (em andamento)
+
+**O que foi feito**
+- README completo: problema, resultados com números reais, arquitetura em Mermaid e PNG (`docs/arquitetura.png`), decisões, como rodar do zero, qualidade e documentação.
+- `docs/design-doc.md`, `docs/limitacoes.md`, `docs/seguranca.md` e `docs/roteiro-video.md` (com o rascunho do post).
+- `docs/relatorio-impacto.md`, gerado por `scripts/impact_report.py` só a partir de `eval/results/`.
+
+**Pendências**
+- Gravar o vídeo (Eduardo), seguindo `docs/roteiro-video.md`.
+- Checklist final da seção 14 da especificação.
